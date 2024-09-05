@@ -1,36 +1,69 @@
 import { Types } from "mongoose";
 
-enum user_role_enum {
-    job_seeker = "job_seeker",    
-    employer = "employer",
-    admin = "admin"
+export enum UserRole {
+    JOB_SEEKER = "job_seeker",    
+    EMPLOYER = "employer",
+    USER = "user",
+    ADMIN = "admin"
   }
   
-enum job_application_status_enum {
-    applied = "Applied",
-    reviewed = "Reviewed",
-    interview = "Interview",
-    hired = "Hired",
-    rejected = "Rejected",
+export enum JobApplicationStatus {
+    APPLIED = "applied",
+    REVIEWED = "reviewed",
+    INTERVIEW = "interview",
+    HIRED = "hired",
+    REJECTED = "rejected",
   }
   
-enum notifications_status_enum {
-    unread = "Unread",
-    read = "Read"
+export enum NotificationsStatus {
+    UNREAD = "unread",
+    READ = "read"
 }
 
-interface IUser {
+export interface IUser {
     username: string;
     password: string;
     email: string;
-    role: user_role_enum;
+    role: UserRole;
+    profile: Types.ObjectId;
+    applied_jobs: Types.ObjectId[];
+    posted_jobs: Types.ObjectId[];
+    notifications: Types.ObjectId[];
+}
+
+export interface IProfile {
     profile_name: string;
     profile_phone: string;
     profile_address: string;
     profile_resume: string;
     profile_company: string;
     profile_position: string;
-    applied_jobs: Types.ObjectId;
-    posted_jobs: Types.ObjectId;
+    user_id: Types.ObjectId;
+}
+
+export interface IJob {
+    title: string;
+    description: string;
+    qualifications: string[]; 
+    responsibilities: string[];
+    location: string;
+    salary_range: string;
+    job_type: string;
+    employer_id: Types.ObjectId;
+    applications: Types.ObjectId[];
 }
   
+export interface IJobApplication {
+    job_id: Types.ObjectId;
+    job_seeker_id: Types.ObjectId;
+    status: JobApplicationStatus;
+    cover_letter: string;
+    resume: string;
+}
+  
+  
+export interface INotification {
+    user_id: Types.ObjectId;
+    message: string;
+    status: NotificationsStatus;
+}
