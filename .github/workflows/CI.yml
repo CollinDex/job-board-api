@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [dev, staging, main, prod]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [dev, staging, main, prod]
+
+jobs:
+  test:
+    runs-on: be-ci-runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run tests with coverage
+        run: yarn test --coverage
+        env:
+          CI: true
+
+      - name: Display coverage report
+        run: |
+          echo "Coverage Report:"
+          if [ -f coverage/lcov-report/index.html ]; then
+            cat coverage/lcov-report/index.html
+          else
+            echo "Coverage report not found"
+          fi
+
+      - name: Build the dist
+        run: yarn build
+
+      # - name: Upload coverage reports
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: coverage-report
+      #     path: coverage/
