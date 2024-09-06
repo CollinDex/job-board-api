@@ -9,7 +9,7 @@ on:
 
 jobs:
   test:
-    runs-on: be-ci-runner
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
