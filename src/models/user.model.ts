@@ -1,6 +1,5 @@
 import { Schema, SchemaTypes, model } from "mongoose";
 import { IUser, UserRole } from "../types";
-import BaseModel from "./base-model";
 
 const userSchema = new Schema<IUser>({
     username: { type: SchemaTypes.String, required: true },
@@ -11,8 +10,10 @@ const userSchema = new Schema<IUser>({
     applied_jobs: [{ type: SchemaTypes.ObjectId, ref: "Job Application", required: false }],
     posted_jobs: [{ type: SchemaTypes.ObjectId, ref: "Job", required: false }],
     notifications: [{ type: SchemaTypes.ObjectId, ref: "Notification", required: false }]
-});
-
-userSchema.loadClass(BaseModel);
+    },
+    {
+        timestamps: true
+    }
+);
 
 export const User = model<IUser>('User', userSchema);

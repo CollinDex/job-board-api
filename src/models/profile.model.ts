@@ -1,6 +1,5 @@
 import { Schema, model, SchemaTypes } from "mongoose";
 import { IProfile } from "../types";
-import BaseModel from "./base-model";
 
 const profileSchema = new Schema<IProfile>({
     profile_name: { type: SchemaTypes.String, required: true },
@@ -9,9 +8,11 @@ const profileSchema = new Schema<IProfile>({
     profile_resume: { type: SchemaTypes.String, required: true },
     profile_company: { type: SchemaTypes.String, required: true },
     profile_position: { type: SchemaTypes.String, required: true },
-    user_id: { type: SchemaTypes.ObjectId, ref: "User", required: true }
+    user_id: { type: SchemaTypes.ObjectId, ref: "User", required: true },
+},
+{
+    timestamps: true
 });
 
-profileSchema.loadClass(BaseModel);
 
 export const Profile = model<IProfile>('Profile', profileSchema);

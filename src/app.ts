@@ -2,7 +2,8 @@ import cors from "cors";
 import express, { Express, Request, Response } from "express";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swaggerConfig";
-//import { errorHandler, routeNotFound } from "./middleware";
+import { errorHandler, routeNotFound } from "./middleware";
+import { authRoute } from "./routes";
 
 const app: Express = express();
 app.options("*", cors());
@@ -34,7 +35,9 @@ app.get("/api/v1", (req: Request, res: Response) => {
   res.json({ message: "I am the express API responding for Job Listing Platform" });
 });
 
-//app.use(errorHandler);
-//app.use(routeNotFound);
+app.use("/api/v1", authRoute);
+
+app.use(errorHandler);
+app.use(routeNotFound);
 
 export default app;

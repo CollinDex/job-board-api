@@ -20,7 +20,13 @@ export enum NotificationsStatus {
     READ = "read"
 }
 
-export interface IUser {
+export interface Base {
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
+}
+export interface IUser extends Base {
+    _id: string;
     username: string;
     password: string;
     email: string;
@@ -31,7 +37,7 @@ export interface IUser {
     notifications: Types.ObjectId[];
 }
 
-export interface IProfile {
+export interface IProfile extends Base {
     profile_name: string;
     profile_phone: string;
     profile_address: string;
@@ -41,7 +47,7 @@ export interface IProfile {
     user_id: Types.ObjectId;
 }
 
-export interface IJob {
+export interface IJob extends Base {
     title: string;
     description: string;
     qualifications: string[]; 
@@ -53,7 +59,7 @@ export interface IJob {
     applications: Types.ObjectId[];
 }
   
-export interface IJobApplication {
+export interface IJobApplication extends Base {
     job_id: Types.ObjectId;
     job_seeker_id: Types.ObjectId;
     status: JobApplicationStatus;
@@ -62,8 +68,25 @@ export interface IJobApplication {
 }
   
   
-export interface INotification {
+export interface INotification extends Base {
     user_id: Types.ObjectId;
     message: string;
     status: NotificationsStatus;
+}
+
+export interface IUserLogin {
+    email: string;
+    password: string;
+}
+
+export interface IUserSignUp {
+    username: string;
+    email: string;
+    password: string;
+    role: UserRole;
+}
+
+export interface JwtPayload {
+    user_id: string;
+    role?: UserRole;
 }
