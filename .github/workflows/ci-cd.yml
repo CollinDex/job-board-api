@@ -1,0 +1,39 @@
+name: CI/CD Pipeline
+
+# Trigger the workflow on push and pull requests to specific branches
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Define the jobs to be run
+jobs:
+  # Job 1: Run Tests
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16' # Change this to your Node.js version if necessary
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm test
+
+      # Upload test results as artifacts for debugging
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: ./test-results # Change this path to where your test results are stored, if applicable
