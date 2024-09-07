@@ -1,47 +1,25 @@
-import { Request, Response } from 'express';
-import { JobApplication } from '../models/job-application.model';
+import { NextFunction, Request, Response } from 'express';
+import { JobApplicationService } from '../services';
+import { sendJsonResponse } from '../utils/send-response';
+import { validateData } from '../middleware/validationMiddleware';
+import { jobApplicationSchema } from '../validation-schema/job-application.schema';
 
-export const applyForJob = async (req: Request, res: Response) => {
-	try {
-		//Extract fields from request body
-		const { job_id, job_seeker_id, cover_letter, resume } = req.body;
+const jobApplicationService = new JobApplicationService();
 
-		// Basic validation to ensure all required fields are provided
-		if (!job_id || !job_seeker_id || !cover_letter || !resume) {
-			return res.status(400).json({ message: 'All fields are required' });
-		}
+export const applyForJob = async (req: Request, res: Response, next: NextFunction) => {
+	validateData(jobApplicationSchema);
+  try {
+    const { job_id, cover_letter } = req.body;
+	const { user_id } = req.user;
 
-		// Log the request body
-		console.log('Request body:', req.body);
+    const { message, jobApplication } = await jobApplicationService.applyForJob({
+		job_id,
+		job_seeker_id: user_id,
+		cover_letter
+	}, req.file.path, req.file.filename);
 
-		// Check if there is already an application from this job seeker for the specified job
-		console.log('Checking for existing application...');
-		const existingApplication = await JobApplication.findOne({ job_id, job_seeker_id });
-		if (existingApplication) {
-			console.log('Existing application found:', existingApplication);
-			return res.status(400).json({ message: 'Job already applied for' });
-		}
-
-		// Create a new job application entry
-		console.log('Creating new application...');
-		const newApplication = new JobApplication({ job_id, job_seeker_id, cover_letter, resume });
-
-		// Save the new application to the database
-		const savedApplication = await newApplication.save();
-
-		// Log the saved application details for debugging purposes
-		console.log('Saved application:', savedApplication);
-
-		// Respond with the saved application and HTTP status 201 (Created)
-		return res.status(201).json(savedApplication);
-	} catch (error) {
-		// Log the error and respond with HTTP status 500 (Internal Server Error)
-		return res.status(500).json({ message: 'An error occurred while applying for the job', error: error.message });
-	}
+    sendJsonResponse(res, 201, message, { jobApplication });
+  } catch (error) {
+    next(error);
+  }
 };
-
-// Get all job applications
-
-// Get job applications based on job title
-
-// Update status of job application

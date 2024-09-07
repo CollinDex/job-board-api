@@ -1,15 +1,11 @@
-// Import the necessary modules
-import {Router} from 'express';
-import { applyForJob } from '../controllers/job-application.controller';
+import { Router } from 'express';
+import { applyForJob } from '../controllers';
+import { authMiddleware } from '../middleware';
+import { uploadFile } from '../middleware/uploadfile';
 
-// Create an instance of the express router
-const applicationRoute = Router();
+const jobApplicationRoute = Router();
 
 // Define a POST route to handle job application submissions
-applicationRoute.post('/apply', applyForJob);
+jobApplicationRoute.post('/apply', authMiddleware, uploadFile, applyForJob);
 
-// Export the router to be used in other parts of the application
-
-export {applicationRoute}
-
-
+export { jobApplicationRoute };

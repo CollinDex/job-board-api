@@ -25,7 +25,7 @@ export class AuthService {
                   );
                 }
                 throw new Conflict("User already exists");
-              } 
+            } 
               
             const hashedPassword = await hashPassword(password);
             const user = new User({

@@ -37,8 +37,6 @@ export const authMiddleware = async (
         });
       }
 
-      log.info(decoded);
-
       const { user_id } = decoded as JwtPayload;
       log.info(`user with id ${user_id} is logged in`);
 
@@ -54,7 +52,7 @@ export const authMiddleware = async (
       }
 
       req.user = {
-        user_id: user.id,
+        user_id: user._id,
         role: user.role
       };
 
