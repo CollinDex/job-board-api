@@ -67,6 +67,7 @@
     "pino": "^9.4.0",
     "pino-pretty": "^11.2.2",
     "reflect-metadata": "^0.2.2",
+    "sinon": "^18.0.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "ts-node": "^10.9.2",
