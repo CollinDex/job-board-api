@@ -1,7 +1,7 @@
 import { Conflict, HttpError } from "../middleware";
 import { JobApplication } from "../models";
 import { IJobApplication } from "../types";
-import { deleteFile, uploadToMega } from "../middleware/uploadfile";
+import { uploadToMega } from "../middleware/uploadfile";
 
 export class JobApplicationService {
     
@@ -16,7 +16,6 @@ export class JobApplicationService {
             const existingApplication = await JobApplication.findOne({ job_id, job_seeker_id });
             
             if (existingApplication) {
-                await deleteFile(filePath);
                 throw new Conflict("You have already applied for this job");
             }
 
