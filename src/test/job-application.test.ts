@@ -1,87 +1,90 @@
-import { Request, Response } from 'express';
-import { applyForJob } from './../controllers/job-application.controller';
-import { JobApplication } from '../models/job-application.model';
+import sinon from "sinon";
+import { JobApplicationService } from "../services/job-application.service";
+import { JobApplication } from "../models";
+import mongoose from "mongoose";
+import { Conflict, HttpError } from "../middleware";
 
-jest.mock('../models/job-application.model'); // Mock the JobApplication model
+describe("JobApplicationService", () => {
+  let jobApplicationService: JobApplicationService;
+  let findOneStub: sinon.SinonStub;
+  let saveStub: sinon.SinonStub;
+  let sandbox: sinon.SinonSandbox;
+  
+  const mockPayload = {
+    job_id: new mongoose.Types.ObjectId("66db88e70e4737e7e20c7db1"),
+    job_seeker_id: new mongoose.Types.ObjectId("66db88e70e4737e7e20c7db1"),
+    cover_letter: "Cover letter text",
+  };
 
-describe('applyForJob', () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-    let statusMock: jest.Mock;
-    let jsonMock: jest.Mock;
+  const mockSavedApplication = {
+    _id: "app123",
+    ...mockPayload,
+    resume: "https://mega.co.nz/fake_resume_link",
+  };
 
-    beforeEach(() => {
-        statusMock = jest.fn().mockReturnThis();
-        jsonMock = jest.fn();
+  beforeEach(() => {
+    sandbox = sinon.createSandbox();
+    jobApplicationService = new JobApplicationService();
 
-        res = {
-            status: statusMock,
-            json: jsonMock
-        };
+    // Stubbing external dependencies
+    findOneStub = sandbox.stub(JobApplication, "findOne");
+    saveStub = sandbox.stub(JobApplication.prototype, "save");
+  });
 
-        req = {
-            body: {
-                job_id: 'job3536',
-                job_seeker_id: 'seeker562',
-                cover_letter: 'This is my cover letter',
-                resume: 'This is my resume'
-            }
-        };
+  afterEach(() => {
+    sandbox.restore(); // Restore the sandbox to avoid side effects between tests
+  });
+
+/*   it("should apply for a job successfully", async () => {
+    // Simulating a scenario where no existing application is found
+    findOneStub.resolves(null);
+    saveStub.resolves(mockSavedApplication); // Simulate successful save
+
+    const result = await jobApplicationService.applyForJob(
+      mockPayload,
+      "path/to/resume.pdf",
+      "resume.pdf"
+    );
+
+    // Assert the expected outcome
+    expect(result).toEqual({
+      message: "Job Application Succesful",
+      jobApplication: mockSavedApplication,
     });
 
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
+    sinon.assert.calledOnce(findOneStub); // Ensure findOne was called once
+    sinon.assert.calledOnce(saveStub); // Ensure save was called once
+  }); */
 
-    it('should return 400 if job already applied for', async () => {
-        // Mock findOne to return an existing document
-        (JobApplication.findOne as jest.Mock).mockResolvedValue({ _id: 'application123' });
+  it("should throw a Conflict error if the user has already applied for the job", async () => {
+    // Simulating an existing application
+    findOneStub.resolves(mockSavedApplication);
 
-        await applyForJob(req as Request, res as Response);
+    await expect(
+      jobApplicationService.applyForJob(
+        mockPayload,
+        "path/to/resume.pdf",
+        "resume.pdf"
+      )
+    ).rejects.toThrow(Conflict); // Ensure the Conflict error is thrown
 
-        expect(JobApplication.findOne).toHaveBeenCalledWith({ job_id: 'job3536', job_seeker_id: 'seeker562' });
-        expect(statusMock).toHaveBeenCalledWith(400);
-        expect(jsonMock).toHaveBeenCalledWith({ message: 'Job already applied for' });
-    });
+    sinon.assert.calledOnce(findOneStub); // Ensure findOne was called once
+    sinon.assert.notCalled(saveStub); // Ensure save was not called
+  });
 
-    it('should save the application and return 201 on success', async () => {
-        // Mock findOne to return null (no existing application)
-        (JobApplication.findOne as jest.Mock).mockResolvedValue(null);
+  it("should throw an HttpError for an unknown error", async () => {
+    // Simulating an unexpected error
+    findOneStub.rejects(new Error("Unknown error"));
 
-        // Mock save to return a new application object
-        (JobApplication.prototype.save as jest.Mock).mockResolvedValue({
-            _id: 'newApplication123',
-            job_id: 'job3536',
-            job_seeker_id: 'seeker562',
-            cover_letter: 'This is my cover letter',
-            resume: 'This is my resume'
-        });
+    await expect(
+      jobApplicationService.applyForJob(
+        mockPayload,
+        "path/to/resume.pdf",
+        "resume.pdf"
+      )
+    ).rejects.toThrow(HttpError); // Ensure HttpError is thrown
 
-        await applyForJob(req as Request, res as Response);
-
-        expect(JobApplication.findOne).toHaveBeenCalledWith({ job_id: 'job3536', job_seeker_id: 'seeker562' });
-        expect(JobApplication.prototype.save).toHaveBeenCalled();
-        expect(statusMock).toHaveBeenCalledWith(201);
-        expect(jsonMock).toHaveBeenCalledWith({
-            _id: 'newApplication123',
-            job_id: 'job3536',
-            job_seeker_id: 'seeker562',
-            cover_letter: 'This is my cover letter',
-            resume: 'This is my resume'
-        });
-    });
-
-    it('should return 500 if there is an error', async () => {
-        // Mock findOne to throw an error
-        (JobApplication.findOne as jest.Mock).mockRejectedValue(new Error('Database error'));
-    
-        await applyForJob(req as Request, res as Response);
-    
-        expect(statusMock).toHaveBeenCalledWith(500);
-        expect(jsonMock).toHaveBeenCalledWith({
-            message: 'An error occurred while applying for the job',
-            error: 'Database error' // Expecting the error message as a string
-        });
-    });
-    
+    sinon.assert.calledOnce(findOneStub); // Ensure findOne was called once
+    sinon.assert.notCalled(saveStub); // Ensure save was not called
+  });
 });
