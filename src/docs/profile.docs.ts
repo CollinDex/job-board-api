@@ -1,4 +1,4 @@
-export const userProfileDocumentation = `
+export const userProfileDocs = `
 /**
  * @swagger
  * /api/v1/profile/employer:
@@ -213,5 +213,163 @@ export const userProfileDocumentation = `
  *         description: Unauthorized request
  *       500:
  *         description: Server error
+ */
+`;
+
+export const uploadResumeDocs= `
+/**
+ * @swagger
+ * /api/v1/profile/upload-resume:
+ *   post:
+ *     summary: Upload Resume for User Profile
+ *     description: Allows authenticated users to upload their resume as part of their profile. The resume will be uploaded and stored in the cloud (Mega).
+ *     tags: [User Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               resume:
+ *                 type: string
+ *                 format: binary
+ *                 description: The resume file to be uploaded (PDF, Word document).
+ *     responses:
+ *       201:
+ *         description: Resume uploaded successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                   example: 201
+ *                 message:
+ *                   type: string
+ *                   example: Resume Upload Succesful
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     profile:
+ *                       type: object
+ *                       properties:
+ *                         _id:
+ *                           type: string
+ *                         profile_name:
+ *                           type: string
+ *                         profile_resume:
+ *                           type: string
+ *                           example: https://mega.nz/resume.pdf
+ *                         updated_at:
+ *                           type: string
+ *                           example: 2024-09-10T08:30:00Z
+ *       409:
+ *         description: User Profile Not Found
+ *       500:
+ *         description: Internal Server Error
+ */
+`;
+
+export const updateUserProfileDocs = `
+/**
+ * @swagger
+ * /api/v1/profile:
+ *   patch:
+ *     summary: Update User Profile
+ *     description: Updates the user's profile information.
+ *     tags: [User Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               profile_name:
+ *                 type: string
+ *                 example: John Doe
+ *               profile_phone:
+ *                 type: string
+ *                 example: 123456789
+ *               profile_address:
+ *                 type: string
+ *                 example: 123 Main St
+ *               profile_company:
+ *                 type: string
+ *                 example: Tech Corp
+ *               profile_position:
+ *                 type: string
+ *                 example: Software Engineer
+ *               profile_company_address:
+ *                 type: string
+ *                 example: 456 Tech Park, Silicon Valley
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Profile Updated Successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     profile:
+ *                       type: object
+ *                       properties:
+ *                         profile_name:
+ *                           type: string
+ *                         profile_phone:
+ *                           type: string
+ *                         profile_address:
+ *                           type: string
+ *                         profile_company:
+ *                           type: string
+ *                         profile_position:
+ *                           type: string
+ *                         profile_company_address:
+ *                           type: string
+ *       400:
+ *         description: Invalid input data
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User profile not found
+ *       500:
+ *         description: Internal server error
+ */
+`;
+
+export const deleteUserProfileDocs = `
+/**
+ * @swagger
+ * /api/v1/profile:
+ *   delete:
+ *     summary: Delete User Profile
+ *     description: Deletes the user's profile.
+ *     tags: [User Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       204:
+ *         description: Profile deleted successfully
+ *       404:
+ *         description: User profile not found
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 `;
