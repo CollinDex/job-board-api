@@ -24,4 +24,14 @@ const createUserProfile = async (req: Request, res: Response, next: NextFunction
     }
 }
 
-export { createUserProfile };
+const getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user_id = new mongoose.Types.ObjectId(req.user.user_id);
+        const { message, profile } = await profileService.getUserProfile(user_id);
+        sendJsonResponse(res, 201, message, {profile});
+    } catch (error) {
+        next(error);
+    }
+}
+
+export { createUserProfile, getUserProfile };

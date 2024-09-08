@@ -1,11 +1,11 @@
 import { Profile, User } from "../models";
 import { IProfile } from "../types";
-import { Conflict, HttpError } from "../middleware";
+import { Conflict, HttpError, ResourceNotFound } from "../middleware";
+import { Types } from "mongoose";
 
 //Profile Service
 //Update User Profile
 //Delete User Profile
-//Get User Profile
 export class ProfileService {
     public async createUserProfile (payload:Partial<IProfile>): Promise<{message: string, profile: IProfile}> {
         try {
@@ -29,6 +29,26 @@ export class ProfileService {
             return {
                 message: "Profile Created Succesfully",
                 profile: savedProfile
+            }
+        } catch (error) {
+            if (error instanceof HttpError) {
+              throw error;
+            }
+            throw new HttpError(error.status || 500, error.message || error);
+        }
+    }
+
+    public async getUserProfile (user_id: Types.ObjectId): Promise<{message: string, profile: Types.ObjectId}> {
+        try {
+            const profile = await User.findOne({_id:user_id}).populate('profile');
+
+            if (profile!) {
+                throw new ResourceNotFound("User Profile not Found");
+            };
+            
+            return {
+                message: "Profile Fetch Succesfully",
+                profile: profile.profile
             }
         } catch (error) {
             if (error instanceof HttpError) {

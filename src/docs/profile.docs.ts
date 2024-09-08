@@ -157,4 +157,61 @@ export const userProfileDocumentation = `
  *       500:
  *         description: Server error
  */
+
+/**
+ * @swagger
+ * /api/v1/profile:
+ *   get:
+ *     summary: Get User Profile
+ *     tags: [User Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Profile fetched successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     profile:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: string
+ *                           example: 12345
+ *                         profile_name:
+ *                           type: string
+ *                           example: John Doe
+ *                         profile_phone:
+ *                           type: string
+ *                           example: "+1234567890"
+ *                         profile_address:
+ *                           type: string
+ *                           example: "123 Main St, City, Country"
+ *                         profile_resume:
+ *                           type: string
+ *                           example: "resume.pdf"
+ *                         profile_company:
+ *                           type: string
+ *                           example: "Tech Corp"
+ *                         profile_position:
+ *                           type: string
+ *                           example: "Software Engineer"
+ *       404:
+ *         description: User profile not found
+ *       401:
+ *         description: Unauthorized request
+ *       500:
+ *         description: Server error
+ */
 `;

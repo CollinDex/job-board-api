@@ -34,6 +34,7 @@ describe("ProfileService", () => {
     findOneStub = sandbox.stub(Profile, "findOne");
     saveStub = sandbox.stub(Profile.prototype, "save");
     findByIdAndUpdateStub = sandbox.stub(User, "findByIdAndUpdate");
+    findUserStub = sandbox.stub(User, "findOne");
   });
 
   afterEach(() => {
@@ -77,5 +78,21 @@ describe("ProfileService", () => {
 
     sinon.assert.notCalled(saveStub);
     sinon.assert.notCalled(findByIdAndUpdateStub);
+  });
+
+  it("should get a user profile successfully", async () => {
+    findOneStub.resolves(null); 
+    saveStub.resolves(mockSavedProfile); 
+    findByIdAndUpdateStub.resolves({}); 
+    const result = await profileService.createUserProfile(mockPayload);
+
+    expect(result).toEqual({
+      message: "Profile Created Succesfully",
+      profile: mockSavedProfile,
+    });
+
+    sinon.assert.calledOnce(findOneStub);
+    sinon.assert.calledOnce(saveStub);
+    sinon.assert.calledOnce(findByIdAndUpdateStub);
   });
 });
