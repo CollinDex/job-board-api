@@ -1,5 +1,5 @@
 import { Conflict, HttpError } from "../middleware";
-import { JobApplication } from "../models";
+import { JobApplication, User } from "../models";
 import { IJobApplication } from "../types";
 import { uploadToMega } from "../middleware/uploadfile";
 
@@ -25,6 +25,12 @@ export class JobApplicationService {
     
             const savedApplication = await newApplication.save();
 
+            await User.findByIdAndUpdate(
+                job_seeker_id, 
+                { $push: { applied_jobs: savedApplication._id } },
+                { new: true }
+            );
+
             return {
                 message: "Job Application Succesful",
                 jobApplication: savedApplication
@@ -34,6 +40,6 @@ export class JobApplicationService {
               throw error;
             }
             throw new HttpError(error.status || 500, error.message || error);
-          }
+        }
     };
 };
