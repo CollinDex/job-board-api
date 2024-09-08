@@ -6,6 +6,6 @@ import { uploadFile } from '../middleware/uploadfile';
 const jobApplicationRoute = Router();
 
 // Define a POST route to handle job application submissions
-jobApplicationRoute.post('jobs/apply', authMiddleware, uploadFile, applyForJob);
+jobApplicationRoute.post('/jobs/apply', authMiddleware, uploadFile, applyForJob);
 
 export { jobApplicationRoute };
