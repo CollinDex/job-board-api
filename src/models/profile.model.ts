@@ -8,7 +8,7 @@ const profileSchema = new Schema<IProfile>({
     profile_resume: { type: SchemaTypes.String, required: true },
     profile_company: { type: SchemaTypes.String, required: true },
     profile_position: { type: SchemaTypes.String, required: true },
-    user_id: { type: SchemaTypes.ObjectId, ref: "User", required: true },
+    user_id: { type: SchemaTypes.ObjectId, ref: "User", unique: true , required: true },
 },
 {
     timestamps: true
