@@ -85,7 +85,7 @@ export const getAllJobApplicationsById = `
  * /api/v1/jobs/getAllJobs/{job_id}:
  *   get:
  *     summary: Get all job applications by job ID
- *     tags: [Job Applications]
+ *     tags: [Job Application]
  *     parameters:
  *       - in: path
  *         name: job_id
