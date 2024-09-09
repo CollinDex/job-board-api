@@ -12,4 +12,4 @@ const jobApplicationSchema = new Schema<IJobApplication>({
     timestamps: true
 });
 
-export const JobApplication = model<IJobApplication>('Job Application', jobApplicationSchema);
+export const JobApplication = model<IJobApplication>('JobApplication', jobApplicationSchema);

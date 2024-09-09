@@ -44,6 +44,7 @@ export interface IProfile extends Base {
     profile_resume: string;
     profile_company: string;
     profile_position: string;
+    profile_company_address: string;
     user_id: Types.ObjectId;
 }
 

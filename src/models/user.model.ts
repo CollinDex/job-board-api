@@ -7,7 +7,7 @@ const userSchema = new Schema<IUser>({
     email: { type: SchemaTypes.String, minlength: 5, required: true, unique: true },
     role: { type: SchemaTypes.String, enum: UserRole, default: UserRole.USER, required: true },
     profile: { type: SchemaTypes.ObjectId, ref: "Profile", required: false },
-    applied_jobs: [{ type: SchemaTypes.ObjectId, ref: "Job Application", required: false }],
+    applied_jobs: [{ type: SchemaTypes.ObjectId, ref: "JobApplication", required: false }],
     posted_jobs: [{ type: SchemaTypes.ObjectId, ref: "Job", required: false }],
     notifications: [{ type: SchemaTypes.ObjectId, ref: "Notification", required: false }]
     },

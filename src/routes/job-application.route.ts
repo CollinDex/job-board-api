@@ -1,20 +1,13 @@
-// Import the necessary modules
 import { Router } from 'express';
-import { applyForJob, getAllJobApplicationsById } from '../controllers/job-application.controller';
-import { validateData } from '../middleware/validationMiddleware';
-import { applyForJobSchema } from '../validation-schema/job-application.schema';
+import { applyForJob, getAllJobApplicationsById } from '../controllers';
+import { authMiddleware } from '../middleware';
+import { uploadFile } from '../middleware/uploadfile';
 
-// Create an instance of the express router
-const applicationRoute = Router();
 
-// Define a POST route to handle job application submissions
-// Endpoint: /apply
-applicationRoute.post('/apply', validateData(applyForJobSchema, ['body']), applyForJob);
+const jobApplicationRoute = Router();
 
-// Define a GET route to get all job applications by job ID
-// Endpoint: /getAllJobs/:job_id
-applicationRoute.get('/getAllJobs/:job_id', getAllJobApplicationsById);
+jobApplicationRoute.post('/jobs/apply', authMiddleware, uploadFile, applyForJob);
 
-// Export the router to be used in other parts of the application
+jobApplicationRoute.get('/jobs/getAllJobs/:job_id', getAllJobApplicationsById);
 
-export { applicationRoute };
+export { jobApplicationRoute };
