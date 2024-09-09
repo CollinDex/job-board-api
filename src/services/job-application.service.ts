@@ -43,21 +43,21 @@ export class JobApplicationService {
         }
     };
   
-  // Service to get job applications By Job Id made by job seekers
-    public async getJobApplicationsByJobIdService (job_id: string) => {
+
+    public async getJobApplicationsByJobId (job_id: string) {
       try {
-        // Find all job applications made by a specific job seeker
+        
         const jobApplicationsById = await JobApplication.find({ job_id });
 
-        // Check if no job applications were found
+        
         if (jobApplicationsById.length === 0) {
           throw new Error(`No job applications found for job ID: ${job_id}`);
         }
 
-        // Return the job applications
+        
         return jobApplicationsById;
       } catch (error) {
-        console.error('Error fetching job applications:', error); // Log the error for debugging
+        console.error('Error fetching job applications:', error); 
         throw new Error(`Error fetching job applications: ${error.message}`);
       }
     };
