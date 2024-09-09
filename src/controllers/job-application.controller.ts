@@ -6,10 +6,6 @@ export const applyForJob = async (req: Request, res: Response) => {
 		// Extract fields from request body
 		const { job_id, job_seeker_id, cover_letter, resume } = req.body;
 
-		// Basic validation to ensure all required fields are provided
-		if (!job_id || !job_seeker_id || !cover_letter || !resume) {
-			return res.status(400).json({ message: 'All fields are required' });
-		}
 
 		// Call service to handle the business logic
 		const savedApplication = await applyForJobService(job_id, job_seeker_id, cover_letter, resume);
