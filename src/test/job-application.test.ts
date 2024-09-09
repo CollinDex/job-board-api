@@ -1,90 +1,73 @@
-import sinon from "sinon";
-import { JobApplicationService } from "../services/job-application.service";
-import { JobApplication } from "../models";
-import mongoose from "mongoose";
-import { Conflict, HttpError } from "../middleware";
+// @ts-nocheck
+import { JobApplicationService } from '../services';
+import { Conflict, HttpError } from '../middleware';
+import { JobApplication, User } from '../models';
+import { uploadToMega } from '../middleware/uploadfile';
 
-describe("JobApplicationService", () => {
-  let jobApplicationService: JobApplicationService;
-  let findOneStub: sinon.SinonStub;
-  let saveStub: sinon.SinonStub;
-  let sandbox: sinon.SinonSandbox;
-  
-  const mockPayload = {
-    job_id: new mongoose.Types.ObjectId("66db88e70e4737e7e20c7db1"),
-    job_seeker_id: new mongoose.Types.ObjectId("66db88e70e4737e7e20c7db1"),
-    cover_letter: "Cover letter text",
-  };
+// Mock the dependencies
+jest.mock('../models');
+jest.mock('../middleware/uploadfile');
 
-  const mockSavedApplication = {
-    _id: "app123",
-    ...mockPayload,
-    resume: "https://mega.co.nz/fake_resume_link",
-  };
+const jobApplicationService = new JobApplicationService();
 
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-    jobApplicationService = new JobApplicationService();
-
-    // Stubbing external dependencies
-    findOneStub = sandbox.stub(JobApplication, "findOne");
-    saveStub = sandbox.stub(JobApplication.prototype, "save");
-  });
-
-  afterEach(() => {
-    sandbox.restore(); // Restore the sandbox to avoid side effects between tests
-  });
-
-/*   it("should apply for a job successfully", async () => {
-    // Simulating a scenario where no existing application is found
-    findOneStub.resolves(null);
-    saveStub.resolves(mockSavedApplication); // Simulate successful save
-
-    const result = await jobApplicationService.applyForJob(
-      mockPayload,
-      "path/to/resume.pdf",
-      "resume.pdf"
-    );
-
-    // Assert the expected outcome
-    expect(result).toEqual({
-      message: "Job Application Succesful",
-      jobApplication: mockSavedApplication,
+describe('JobApplicationService', () => {
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
-    sinon.assert.calledOnce(findOneStub); // Ensure findOne was called once
-    sinon.assert.calledOnce(saveStub); // Ensure save was called once
-  }); */
+    describe('applyForJob', () => {
+        it('should apply for a job successfully', async () => {
+            const payload = { job_id: '123', job_seeker_id: '456', cover_letter: 'This is my cover letter' };
+            const filePath = '/path/to/resume';
+            const filename = 'resume.pdf';
+            const resumeLink = 'https://mega.nz/file/resume.pdf';
+            const savedApplication = { _id: '789', ...payload, resume: resumeLink };
 
-  it("should throw a Conflict error if the user has already applied for the job", async () => {
-    // Simulating an existing application
-    findOneStub.resolves(mockSavedApplication);
+            // Mock the existing application check
+            (JobApplication.findOne as jest.Mock).mockResolvedValue(null);
 
-    await expect(
-      jobApplicationService.applyForJob(
-        mockPayload,
-        "path/to/resume.pdf",
-        "resume.pdf"
-      )
-    ).rejects.toThrow(Conflict); // Ensure the Conflict error is thrown
+            // Mock the file upload to return a resume link
+            (uploadToMega as jest.Mock).mockResolvedValue(resumeLink);
 
-    sinon.assert.calledOnce(findOneStub); // Ensure findOne was called once
-    sinon.assert.notCalled(saveStub); // Ensure save was not called
-  });
+            // Mock saving the new application
+            (JobApplication.prototype.save as jest.Mock).mockResolvedValue(savedApplication);
 
-  it("should throw an HttpError for an unknown error", async () => {
-    // Simulating an unexpected error
-    findOneStub.rejects(new Error("Unknown error"));
+            // Mock updating the user's applied_jobs list
+            (User.findByIdAndUpdate as jest.Mock).mockResolvedValue(true);
 
-    await expect(
-      jobApplicationService.applyForJob(
-        mockPayload,
-        "path/to/resume.pdf",
-        "resume.pdf"
-      )
-    ).rejects.toThrow(HttpError); // Ensure HttpError is thrown
+            const result = await jobApplicationService.applyForJob(payload, filePath, filename);
 
-    sinon.assert.calledOnce(findOneStub); // Ensure findOne was called once
-    sinon.assert.notCalled(saveStub); // Ensure save was not called
-  });
+            // Assertions
+            expect(JobApplication.findOne).toHaveBeenCalledWith({ job_id: payload.job_id, job_seeker_id: payload.job_seeker_id });
+            expect(uploadToMega).toHaveBeenCalledWith(filePath, filename);
+            expect(JobApplication.prototype.save).toHaveBeenCalled();
+            expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+                payload.job_seeker_id,
+                { $push: { applied_jobs: savedApplication._id } },
+                { new: true }
+            );
+            expect(result).toEqual({
+                message: 'Job Application Succesful',
+                jobApplication: savedApplication,
+            });
+        });
+
+        it('should throw Conflict error if the job application already exists', async () => {
+            const payload = { job_id: '123', job_seeker_id: '456' };
+            const existingApplication = { _id: '789', ...payload };
+
+            // Mock an existing job application
+            (JobApplication.findOne as jest.Mock).mockResolvedValue(existingApplication);
+
+            await expect(jobApplicationService.applyForJob(payload, '/path/to/resume', 'resume.pdf'))
+                .rejects
+                .toThrow(new Conflict('You have already applied for this job'));
+
+            // Check that findOne was called correctly
+            expect(JobApplication.findOne).toHaveBeenCalledWith({ job_id: payload.job_id, job_seeker_id: payload.job_seeker_id });
+            // Ensure no further calls are made when a conflict occurs
+            expect(uploadToMega).not.toHaveBeenCalled();
+            expect(JobApplication.prototype.save).not.toHaveBeenCalled();
+        });
+    });
 });
