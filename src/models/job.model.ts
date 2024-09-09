@@ -1,5 +1,5 @@
 import { Schema, model, SchemaTypes } from "mongoose";
-import { IJob } from "../types";
+import { IJob, JobStatus } from "../types";
 
 const jobSchema = new Schema<IJob>({
     title: { type: SchemaTypes.String, required: true },
@@ -10,6 +10,7 @@ const jobSchema = new Schema<IJob>({
     salary_range: { type: SchemaTypes.String, required: true },
     job_type: { type: SchemaTypes.String, required: true },
     employer_id: { type: SchemaTypes.ObjectId, ref: "User", required: true },
+    status: { type: SchemaTypes.String, enum: JobStatus, default: JobStatus.OPEN },
     applications: [{ type: SchemaTypes.ObjectId, ref: "JobApplication", required: false }],
 },
 {
