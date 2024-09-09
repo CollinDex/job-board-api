@@ -9,7 +9,7 @@ import { deleteFile } from '../middleware/uploadfile';
 const jobApplicationService = new JobApplicationService();
 
 
-export const applyForJob = async (req: Request, res: Response, next: NextFunction) => {
+const applyForJob = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Validate request body using Zod schema
     const validatedData = jobApplicationSchema.parse(req.body);
@@ -52,3 +52,4 @@ export const applyForJob = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
+export { applyForJob };

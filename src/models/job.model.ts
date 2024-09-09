@@ -10,7 +10,7 @@ const jobSchema = new Schema<IJob>({
     salary_range: { type: SchemaTypes.String, required: true },
     job_type: { type: SchemaTypes.String, required: true },
     employer_id: { type: SchemaTypes.ObjectId, ref: "User", required: true },
-    applications: [{ type: SchemaTypes.ObjectId, ref: "Job Application", required: false }],
+    applications: [{ type: SchemaTypes.ObjectId, ref: "JobApplication", required: false }],
 },
 {
     timestamps: true
