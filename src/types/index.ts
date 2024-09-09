@@ -13,7 +13,12 @@ export enum JobApplicationStatus {
     INTERVIEW = "interview",
     HIRED = "hired",
     REJECTED = "rejected",
-  }
+}
+
+export enum JobStatus {
+    OPEN = "open",
+    CLOSED = "closed",
+}
   
 export enum NotificationsStatus {
     UNREAD = "unread",
@@ -56,6 +61,7 @@ export interface IJob extends Base {
     location: string;
     salary_range: string;
     job_type: string;
+    status: JobStatus;
     employer_id: Types.ObjectId;
     applications: Types.ObjectId[];
 }
