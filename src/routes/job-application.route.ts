@@ -1,11 +1,13 @@
 import { Router } from 'express';
-import { applyForJob } from '../controllers';
+import { applyForJob, getAllJobApplicationsById } from '../controllers';
 import { authMiddleware } from '../middleware';
 import { uploadFile } from '../middleware/uploadfile';
 
+
 const jobApplicationRoute = Router();
 
-// Define a POST route to handle job application submissions
 jobApplicationRoute.post('/jobs/apply', authMiddleware, uploadFile, applyForJob);
+
+jobApplicationRoute.get('/jobs/getAllJobs/:job_id', getAllJobApplicationsById);
 
 export { jobApplicationRoute };

@@ -78,3 +78,59 @@ export const jobApplication = `
  *         description: Internal Server Error
  */
 `;
+
+export const getAllJobApplicationsById = `
+/**
+ * @swagger
+ * /api/v1/jobs/getAllJobs/{job_id}:
+ *   get:
+ *     summary: Get all job applications by job ID
+ *     tags: [Job Applications]
+ *     parameters:
+ *       - in: path
+ *         name: job_id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the job to retrieve applications for
+ *         example: 64bcf7b4c7e03d002bfa8994
+ *     responses:
+ *       200:
+ *         description: Job applications retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Job applications retrieved successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       job_id:
+ *                         type: string
+ *                       job_seeker_id:
+ *                         type: string
+ *                       cover_letter:
+ *                         type: string
+ *                       resume:
+ *                         type: string
+ *                       status:
+ *                         type: string
+ *                         example: applied
+ *                       created_at:
+ *                         type: string
+ *                       updated_at:
+ *                         type: string
+ *       404:
+ *         description: No applications found for the given job ID
+ *       500:
+ *         description: Some server error
+ */
+`;

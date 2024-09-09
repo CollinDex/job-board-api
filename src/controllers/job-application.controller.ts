@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { JobApplicationService } from '../services';
+import { JobApplicationService, getJobApplicationsByJobIdService } from '../services';
 import { sendJsonResponse } from '../utils/send-response';
 import { jobApplicationSchema } from '../validation-schema/job-application.schema';
 import { ZodError } from "zod";
@@ -52,4 +52,22 @@ const applyForJob = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { applyForJob };
+// Get all job applications by Job Id
+const getAllJobApplicationsById = async (req: Request, res: Response) => {
+	try {
+		// Extract job_id from request parameters
+		const { job_id } = req.params;
+
+		// Fetch job applications using the service
+		const jobApplicationsById = await getJobApplicationsByJobIdService(job_id);
+
+		// Send a successful response with job applications
+		return res.status(200).json(jobApplicationsById);
+	} catch (error) {
+		// Handle errors and send a failure response
+		// console.error('Error fetching job applications:', error);
+		return res.status(500).json({ message: error.message });
+	}
+};
+
+export { applyForJob, getAllJobApplicationsById };

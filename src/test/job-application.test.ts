@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { JobApplicationService } from '../services';
+import { JobApplicationService, getJobApplicationsByJobIdService } from '../services';
 import { Conflict, HttpError } from '../middleware';
 import { JobApplication, User } from '../models';
 import { uploadToMega } from '../middleware/uploadfile';
@@ -7,6 +7,7 @@ import { uploadToMega } from '../middleware/uploadfile';
 // Mock the dependencies
 jest.mock('../models');
 jest.mock('../middleware/uploadfile');
+//jest.mock('./../services/job-application.service');
 
 const jobApplicationService = new JobApplicationService();
 
@@ -70,4 +71,33 @@ describe('JobApplicationService', () => {
             expect(JobApplication.prototype.save).not.toHaveBeenCalled();
         });
     });
+  
+  describe('GET /api/v1/getAllJobs/:job_id', () => {
+    it('should return job applications for a valid job_id', async () => {
+        // Arrange
+        const job_id = '3467';
+        const mockJobApplications = [{ job_id, applicant: 'Martin James', status: 'applied' }];
+        (getJobApplicationsByJobIdService as jest.Mock).mockResolvedValue(mockJobApplications);
+
+        // Act
+        const response = await request(app).get(`/api/v1/getAllJobs/${job_id}`);
+
+        // Assert
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockJobApplications);
+    });
+  
+    it('should return 500 on service error', async () => {
+        // Arrange
+        const job_id = '3467';
+        (getJobApplicationsByJobIdService as jest.Mock).mockRejectedValue(new Error('Service error'));
+
+        // Act
+        const response = await request(app).get(`/api/v1/getAllJobs/${job_id}`);
+
+        // Assert
+        expect(response.status).toBe(500);
+        expect(response.body).toEqual({ message: 'Service error' }); // Changed to match JSON response format
+    });
+});
 });
