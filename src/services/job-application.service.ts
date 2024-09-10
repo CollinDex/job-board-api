@@ -14,17 +14,17 @@ export const applyForJobService = async (
 	}
 
 	// Create a new job application entry
-	const newApplication = new JobApplication({ job_id, job_seeker_id, cover_letter, resume });
+	const newApplication = new JobApplication({ job_id, job_seeker_id, cover_letter, resume});
 
 	// Save the new application to the database
 	const savedApplication = await newApplication.save();
 	return savedApplication;
 };
 
-// Service to get job applications By Job Id made by job seekers
+// Service to get specific job applications By Job Id made by job seekers
 export const getJobApplicationsByJobIdService = async (job_id: string) => {
 	try {
-		// Find all job applications made by a specific job seeker
+		// Find job applications using Job Id
 		const jobApplicationsById = await JobApplication.find({ job_id });
 
 		// Check if no job applications were found
