@@ -19,4 +19,4 @@ const jobSchema = new Schema<IJob>({
 });
 
 
-export const Jobs = model<IJob>('Job', jobSchema);
+export const Job = model<IJob>('Job', jobSchema);
