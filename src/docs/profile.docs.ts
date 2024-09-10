@@ -105,13 +105,7 @@ export const userProfileDocs = `
  *                 example: "123 Main St, City, Country"
  *               profile_resume:
  *                 type: string
- *                 example: "resume.pdf"
- *               profile_company:
- *                 type: string
- *                 example: "Tech Corp"
- *               profile_position:
- *                 type: string
- *                 example: "Software Engineer"
+ *                 example: "https://mega.nz/file/MiUhxYxR#cs0JiiqLfnDXLoA4kcx6AIddRi8W7Dy1954ieFmpzNA"
  *     responses:
  *       201:
  *         description: Job seeker profile created successfully
@@ -142,10 +136,6 @@ export const userProfileDocs = `
  *                         profile_address:
  *                           type: string
  *                         profile_resume:
- *                           type: string
- *                         profile_company:
- *                           type: string
- *                         profile_position:
  *                           type: string
  *                         user_id:
  *                           type: string

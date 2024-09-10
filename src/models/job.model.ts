@@ -7,7 +7,8 @@ const jobSchema = new Schema<IJob>({
     qualifications: [{ type: SchemaTypes.String, required: true }], 
     responsibilities: [{ type: SchemaTypes.String, required: true }],
     location: { type: SchemaTypes.String, required: true },
-    salary_range: { type: SchemaTypes.String, required: true },
+    min_salary: { type: Number, required: true },
+    max_salary: { type: Number, required: true },
     job_type: { type: SchemaTypes.String, required: true },
     employer_id: { type: SchemaTypes.ObjectId, ref: "User", required: true },
     status: { type: SchemaTypes.String, enum: JobStatus, default: JobStatus.OPEN },
@@ -18,4 +19,4 @@ const jobSchema = new Schema<IJob>({
 });
 
 
-export const Jobs = model<IJob>('Job', jobSchema);
+export const Job = model<IJob>('Job', jobSchema);
