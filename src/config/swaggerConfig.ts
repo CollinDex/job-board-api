@@ -14,19 +14,23 @@ const swaggerDefinition: SwaggerDefinition = {
       url: `http://localhost:${config.port}/`,
       description: "Local server",
     },
-    /* {
-      url: "https://api.staging.aiforhomework.com/",
+    {
+      url: "https://job-board-api-production.up.railway.app/",
       description: "Live server",
-    }, */
+    },
   ],
   tags: [
     {
-      name: "default",
-      description: "A list of all default routes",
-    },
-    {
       name: "Authentication",
       description: "A list of routes for Authentication",
+    },
+    {
+      name: "Job Application",
+      description: "A list of routes for Job Applications",
+    },
+    {
+      name: "User Profile",
+      description: "A list of routes for Profile Management",
     },
   ],
   components: {

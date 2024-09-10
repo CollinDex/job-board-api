@@ -13,6 +13,9 @@ const config = {
   TOKEN_SECRET: process.env.AUTH_SECRET,
   TOKEN_EXPIRY: process.env.AUTH_EXPIRY,
   SWAGGER_JSON_URL: process.env.SWAGGER_JSON_URL,
+  MEGA_EMAIL: process.env.MEGA_EMAIL,
+  MEGA_PASSWORD: process.env.MEGA_PASSWORD,
+  MEGA_FOLDER: process.env.MEGA_FOLDER,
 };
 
 export default config;

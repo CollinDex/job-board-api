@@ -1,9 +1,8 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-export const applyForJobSchema = z.object({
-  job_id: z.string().nonempty({ message: 'Job ID is required' }),
-  job_seeker_id: z.string().nonempty({ message: 'Job Seeker ID is required' }),
-  status: z.enum(['applied', 'reviewed', 'interviewed', 'offered', 'rejected']).default('applied'),
-  cover_letter: z.string().nonempty({ message: 'Cover Letter is required' }),
-  resume: z.string().nonempty({ message: 'Resume is required' }),
+const jobApplicationSchema = z.object({
+    job_id: z.string().min(1, { message: "job_id cannot be empty" }),
+    cover_letter: z.string().min(1, { message: "Cover Letter cannot be empty" })
 });
+
+export { jobApplicationSchema };

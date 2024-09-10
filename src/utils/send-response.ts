@@ -13,6 +13,7 @@ export const sendUser = (user:IUser) => {
 export const sendLoginResponse = (user:IUser) => {
   return {
     id: user._id,
+    username: user.username,
     email: user.email,
     role: user.role,
     profile: user.profile,

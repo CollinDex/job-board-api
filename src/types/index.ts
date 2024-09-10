@@ -13,7 +13,12 @@ export enum JobApplicationStatus {
     INTERVIEW = "interview",
     HIRED = "hired",
     REJECTED = "rejected",
-  }
+}
+
+export enum JobStatus {
+    OPEN = "open",
+    CLOSED = "closed",
+}
   
 export enum NotificationsStatus {
     UNREAD = "unread",
@@ -44,6 +49,7 @@ export interface IProfile extends Base {
     profile_resume: string;
     profile_company: string;
     profile_position: string;
+    profile_company_address: string;
     user_id: Types.ObjectId;
 }
 
@@ -53,8 +59,10 @@ export interface IJob extends Base {
     qualifications: string[]; 
     responsibilities: string[];
     location: string;
-    salary_range: string;
+    min_salary: number;
+    max_salary: number;
     job_type: string;
+    status: JobStatus;
     employer_id: Types.ObjectId;
     applications: Types.ObjectId[];
 }

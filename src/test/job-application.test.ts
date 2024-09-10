@@ -1,118 +1,122 @@
-import { Request, Response } from 'express';
-import { applyForJob } from './../controllers/job-application.controller';
-import { applyForJobService, getJobApplicationsByJobIdService } from './../services/job-application.service';
-import app from '../app';
-import request from 'supertest';
+// @ts-nocheck
+import { JobApplicationService } from '../services';
+import { Conflict } from '../middleware';
+import { JobApplication, User } from '../models';
+import { uploadToMega } from '../middleware/uploadfile';
 
+// Mock the dependencies
+jest.mock('../models');
+jest.mock('../middleware/uploadfile');
 
-jest.mock('./../services/job-application.service'); // Mock the service
+const jobApplicationService = new JobApplicationService();
 
-describe('applyForJob', () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-    let statusMock: jest.Mock;
-    let jsonMock: jest.Mock;
+describe('JobApplicationService', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-    beforeEach(() => {
-        statusMock = jest.fn().mockReturnThis();
-        jsonMock = jest.fn();
+  describe('applyForJob', () => {
+    it('should apply for a job successfully', async () => {
+      const payload = { job_id: 'job123', job_seeker_id: 'seeker456', cover_letter: 'Cover Letter' };
+      const filePath = '/path/to/resume';
+      const filename = 'resume.pdf';
+      const resumeLink = 'https://mega.nz/file/resume.pdf';
+      const savedApplication = { _id: 'app789', ...payload, resume: resumeLink };
 
-        res = {
-            status: statusMock,
-            json: jsonMock
-        };
+      // Mock the existing application check
+      (JobApplication.findOne as jest.Mock).mockResolvedValue(null);
 
-        req = {
-            body: {
-                job_id: 'job3536',
-                job_seeker_id: 'seeker562',
-                cover_letter: 'This is my cover letter',
-                resume: 'This is my resume'
-            }
-        };
+      // Mock the file upload to return a resume link
+      (uploadToMega as jest.Mock).mockResolvedValue(resumeLink);
+
+      // Mock saving the new application
+      (JobApplication.prototype.save as jest.Mock).mockResolvedValue(savedApplication);
+
+      // Mock updating the user's applied_jobs list
+      (User.findByIdAndUpdate as jest.Mock).mockResolvedValue(true);
+
+      const result = await jobApplicationService.applyForJob(payload, filePath, filename);
+
+      // Assertions
+      expect(JobApplication.findOne).toHaveBeenCalledWith({ job_id: payload.job_id, job_seeker_id: payload.job_seeker_id });
+      expect(uploadToMega).toHaveBeenCalledWith(filePath, filename);
+      expect(JobApplication.prototype.save).toHaveBeenCalled();
+      expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+        payload.job_seeker_id,
+        { $push: { applied_jobs: savedApplication._id } },
+        { new: true }
+      );
+      expect(result).toEqual({
+        message: 'Job Application Succesful',
+        jobApplication: savedApplication,
+      });
     });
 
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
+    it('should throw Conflict error if the job application already exists', async () => {
+      const payload = { job_id: 'job123', job_seeker_id: 'seeker456' };
+      const existingApplication = { _id: 'app789', ...payload };
 
-    it('should return 400 if job already applied for', async () => {
-        // Mock applyForJobService to throw an error indicating job already applied for
-        (applyForJobService as jest.Mock).mockRejectedValue(new Error('Job already applied for'));
+      // Mock an existing job application
+      (JobApplication.findOne as jest.Mock).mockResolvedValue(existingApplication);
 
-        await applyForJob(req as Request, res as Response);
+      await expect(jobApplicationService.applyForJob(payload, '/path/to/resume', 'resume.pdf'))
+        .rejects
+        .toThrow(new Conflict('You have already applied for this job'));
 
-        expect(applyForJobService).toHaveBeenCalledWith('job3536', 'seeker562', 'This is my cover letter', 'This is my resume');
-        expect(statusMock).toHaveBeenCalledWith(400);
-        expect(jsonMock).toHaveBeenCalledWith({ message: 'Job already applied for' });
-    });
-
-    it('should save the application and return 201 on success', async () => {
-        // Mock applyForJobService to return a new application object
-        (applyForJobService as jest.Mock).mockResolvedValue({
-            _id: 'newApplication123',
-            job_id: 'job3536',
-            job_seeker_id: 'seeker562',
-            cover_letter: 'This is my cover letter',
-            resume: 'This is my resume'
-        });
-
-        await applyForJob(req as Request, res as Response);
-
-        expect(applyForJobService).toHaveBeenCalledWith('job3536', 'seeker562', 'This is my cover letter', 'This is my resume');
-        expect(statusMock).toHaveBeenCalledWith(201);
-        expect(jsonMock).toHaveBeenCalledWith({
-            _id: 'newApplication123',
-            job_id: 'job3536',
-            job_seeker_id: 'seeker562',
-            cover_letter: 'This is my cover letter',
-            resume: 'This is my resume'
-        });
-    });
-
-    it('should return 500 if there is an error', async () => {
-        // Mock applyForJobService to throw a generic error
-        (applyForJobService as jest.Mock).mockRejectedValue(new Error('Database error'));
-
-        await applyForJob(req as Request, res as Response);
-
-        expect(applyForJobService).toHaveBeenCalledWith('job3536', 'seeker562', 'This is my cover letter', 'This is my resume');
-        expect(statusMock).toHaveBeenCalledWith(500);
-        expect(jsonMock).toHaveBeenCalledWith({
-            message: 'An error occurred while applying for the job',
-            error: 'Database error'
-        });
-    });
-});
-describe('GET /api/v1/getAllJobs/:job_id', () => {
-    it('should return job applications for a valid job_id', async () => {
-        // Arrange
-        const job_id = '3467';
-        const mockJobApplications = [{ job_id, applicant: 'Martin James', status: 'applied' }];
-        (getJobApplicationsByJobIdService as jest.Mock).mockResolvedValue(mockJobApplications);
-
-        // Act
-        const response = await request(app).get(`/api/v1/getAllJobs/${job_id}`);
-
-        // Assert
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual(mockJobApplications);
-    });
-
-    
+      // Ensure findOne was called with the correct parameters
+      expect(JobApplication.findOne).toHaveBeenCalledWith({ job_id: payload.job_id, job_seeker_id: payload.job_seeker_id });
       
-      
-
-    it('should return 500 on service error', async () => {
-        // Arrange
-        const job_id = '3467';
-        (getJobApplicationsByJobIdService as jest.Mock).mockRejectedValue(new Error('Service error'));
-
-        // Act
-        const response = await request(app).get(`/api/v1/getAllJobs/${job_id}`);
-
-        // Assert
-        expect(response.status).toBe(500);
-        expect(response.body).toEqual({ message: 'Service error' }); // Changed to match JSON response format
+      // Ensure no further calls were made after the conflict
+      expect(uploadToMega).not.toHaveBeenCalled();
+      expect(JobApplication.prototype.save).not.toHaveBeenCalled();
     });
+  });
+
+  describe('getJobApplicationsByJobId', () => {
+    it('should return job applications for a valid job ID', async () => {
+      const job_id = 'job123';
+      const jobApplications = [
+        { _id: 'app1', job_id, job_seeker_id: 'seeker1' },
+        { _id: 'app2', job_id, job_seeker_id: 'seeker2' }
+      ];
+
+      // Mock the JobApplication.find to return job applications
+      (JobApplication.find as jest.Mock).mockResolvedValue(jobApplications);
+
+      const result = await jobApplicationService.getJobApplicationsByJobId(job_id);
+
+      // Assertions
+      expect(JobApplication.find).toHaveBeenCalledWith({ job_id });
+      expect(result).toEqual(jobApplications);
+    });
+
+    it('should throw an error if no job applications are found', async () => {
+      const job_id = 'job123';
+
+      // Mock the JobApplication.find to return an empty array
+      (JobApplication.find as jest.Mock).mockResolvedValue([]);
+
+      await expect(jobApplicationService.getJobApplicationsByJobId(job_id))
+        .rejects
+        .toThrow(`No job applications found for job ID: ${job_id}`);
+
+      // Ensure find was called
+      expect(JobApplication.find).toHaveBeenCalledWith({ job_id });
+    });
+
+    it('should handle an unexpected error when fetching job applications', async () => {
+      const job_id = 'job123';
+      const error = new Error('Database Error');
+
+      // Mock the JobApplication.find to throw an error
+      (JobApplication.find as jest.Mock).mockRejectedValue(error);
+
+      await expect(jobApplicationService.getJobApplicationsByJobId(job_id))
+        .rejects
+        .toThrow(`Error fetching job applications: ${error.message}`);
+
+      // Ensure find was called
+      expect(JobApplication.find).toHaveBeenCalledWith({ job_id });
+    });
+  });
 });
