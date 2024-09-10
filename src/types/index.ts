@@ -59,7 +59,8 @@ export interface IJob extends Base {
     qualifications: string[]; 
     responsibilities: string[];
     location: string;
-    salary_range: string;
+    min_salary: number;
+    max_salary: number;
     job_type: string;
     status: JobStatus;
     employer_id: Types.ObjectId;
