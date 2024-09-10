@@ -1,37 +1,34 @@
 # Job Listing Platform
 
 ## Overview
-The **Job Listing Platform** is a web-based application designed to connect job seekers and employers. It allows employers to post jobs and search for potential candidates, while job seekers can search for jobs, apply for listings, and manage their profiles.
+The **Job Listing Platform** is a web-based application designed to connect job seekers and employers. It allows employers to post jobs while job seekers can search for jobs, apply for listings and upload their resume. Both users can manage their profiles.
 
 ## Features
 
 ### Job Seeker Features:
-- **Job Search:** Search for jobs based on location, keywords, and job type.
-- **Job Application:** Apply for jobs directly from the platform.
-- **Profile Management:** Create and update user profiles with relevant experience, skills, and education.
-- **Save Jobs:** Save jobs to a personal list for future reference.
+- **Job Search:** Search for jobs based on location, salary range, and job type.
+- **Job Application:** Apply for jobs directly from the platform and Get a list of jobs they have applied for and its application status.
 - **Notifications:** Receive realtime notifications for job matches and updates.
 
 ### Employer Features:
 - **Post Jobs:** Create and post new job listings, specifying job title, location, description, and qualifications.
 - **Manage Jobs:** View and manage all posted jobs, including updating job details or closing listings.
 - **View Applications:** Access job applications, review cover letters and resumes, and track application statuses.
+- **Job Application Management:** Ability to track and manage job applications, including their status (applied, reviewed, interviewed, offered, rejected).
+- **Notifications:** Receive realtime notifications for job applications and updates.
 
 
 ### General Features:
 - **User Authentication:** Secure user registration and login system (OAuth supported).
-- **Admin Dashboard:** Admin control over job postings, user management, and platform moderation.
-- **Search Filters:** Powerful filtering options to narrow down job searches.
-- **Job Application Management:** Ability to track and manage job applications, including their status (applied, reviewed, interviewed, offered, rejected).
+- **Profile Management:** Create and update user profiles with personal data.
  
-
 ## Tech Stack
 
 - **Backend:**
   - Node.js with Express.js
   - MongoDB with Mongoose (NoSQL database)
   - JWT for authentication
-  - Cloudinary for media storage (for profile pictures and resumes)
+  - Mega for media storage (for resumes)
 
 ## Getting Started
 
