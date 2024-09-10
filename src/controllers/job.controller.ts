@@ -11,7 +11,7 @@ const createJob = async (req: Request, res: Response, next: NextFunction ) => {
     try {
 
         if (req.user.role != UserRole.EMPLOYER) {
-            throw new Unauthorized("Job Seekers cannot create a Job");
+            throw new Unauthorized("Only Employers can create a Job");
         };
 
         const payload = req.body as IJob;
@@ -30,7 +30,7 @@ const getCreatedJobs = async (req: Request, res: Response, next: NextFunction) =
     try {
 
         if (req.user.role != UserRole.EMPLOYER) {
-            throw new Unauthorized("Job Seekers cannot create a Job");
+            throw new Unauthorized("Only Employers can fetch a job they created");
         };
 
         const user_id = new mongoose.Types.ObjectId(req.user.user_id);
