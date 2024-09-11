@@ -20,7 +20,7 @@ const createJob = async (req: Request, res: Response, next: NextFunction ) => {
 
         const { message, job } = await jobService.createJob(payload);
         
-        sendJsonResponse(res, 201, message, {job})
+        sendJsonResponse(res, 201, message, {job});
     } catch (error) {
         next(error);
     }
