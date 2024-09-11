@@ -90,7 +90,7 @@ export class ProfileService {
             const profileExists = await Profile.findOne({user_id: user_id});
             
             if (!profileExists) {
-                throw new Conflict("User Profile not found");
+                throw new ResourceNotFound("User Profile not found");
             };
 
             const updatedProfile = await Profile.findByIdAndUpdate(
