@@ -5,6 +5,7 @@ import swaggerSpec from "./config/swaggerConfig";
 import { errorHandler, routeNotFound } from "./middleware";
 import { authRoute, jobApplicationRoute, userProfileRoute  } from "./routes";
 import { jobRoute } from "./routes/job.route";
+import { jobSearchRoute } from "./routes/search.route";
 
 const app: Express = express();
 app.options("*", cors());
@@ -40,6 +41,7 @@ app.use("/api/v1", authRoute);
 app.use("/api/v1", jobApplicationRoute);
 app.use("/api/v1", userProfileRoute);
 app.use("/api/v1", jobRoute);
+app.use("/api/v1", jobSearchRoute);
 
 app.use(errorHandler);
 app.use(routeNotFound);
