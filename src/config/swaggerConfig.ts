@@ -36,6 +36,10 @@ const swaggerDefinition: SwaggerDefinition = {
       name: "Job Listings",
       description: "A list of routes for Job Listings",
     },
+    {
+      name: "Job Search",
+      description: "A list of routes for Job Search",
+    },
   ],
   components: {
     securitySchemes: {
