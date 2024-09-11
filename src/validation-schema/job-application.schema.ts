@@ -5,4 +5,11 @@ const jobApplicationSchema = z.object({
     cover_letter: z.string().min(1, { message: "Cover Letter cannot be empty" })
 });
 
-export { jobApplicationSchema };
+// Define Zod schema for status validation
+const jobApplicationStatusSchema = z.object({
+    job_id: z.string().min(1, { message: "Job ID cannot be empty" }),
+    job_seeker_id: z.string().min(1, { message: "Job Seeker ID cannot be empty" }),
+    status: z.enum(['applied', 'interviewing', 'hired', 'rejected', 'open'], { 
+    })
+});
+export { jobApplicationSchema,jobApplicationStatusSchema  };

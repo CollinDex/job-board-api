@@ -134,3 +134,63 @@ export const getAllJobApplicationsById = `
  *         description: Some server error
  */
 `;
+export const updateJobApplicationStatus = `
+/**
+ * @swagger
+ * /api/v1/jobs/updateJobApplicationStatus:
+ *   put:
+ *     summary: Update the status of a job application
+ *     tags: [Job Application]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               job_id:
+ *                 type: string
+ *                 description: The ID of the job application
+ *                 example: 64bcf7b4c7e03d002bfa8994
+ *               status:
+ *                 type: string
+ *                 description: The new status of the job application
+ *                 enum: [applied, interviewing, hired, rejected, open]
+ *                 example: hired
+ *     responses:
+ *       200:
+ *         description: Job application status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Job application status updated successfully
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                   example: 400
+ *                 message:
+ *                   type: string
+ *                   example: Validation error
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       404:
+ *         description: Job application not found
+ *       500:
+ *         description: Some server error
+ */
+`;
