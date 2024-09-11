@@ -16,7 +16,7 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { user, access_token, message } = await authService.signIn(req.body);
-        sendJsonResponse(res, 201, message, { user, access_token });   
+        sendJsonResponse(res, 200, message, { user, access_token });   
     } catch (error) {
         next(error);
     }
