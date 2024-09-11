@@ -50,7 +50,7 @@ export class AuthService {
             return {
                 user: userResponse,
                 access_token,
-                message: "User Created Succesfully",
+                message: "User Created Successfully",
             };
 
         } catch (error) {

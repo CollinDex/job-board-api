@@ -175,7 +175,7 @@ describe('ProfileService', () => {
         });
     });    
 
-        it('should throw Conflict error if the profile does not exist', async () => {
+        it('should throw Resource not found error if the profile does not exist', async () => {
             const payload = { user_id: new Types.ObjectId(), name: 'John Doe' };
             (Profile.findOne as jest.Mock).mockResolvedValue(null);
 
