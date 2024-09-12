@@ -1,5 +1,124 @@
 // @ts-nocheck
-import { JobApplicationService } from '../services/job-application.service';
+import { JobApplicationService } from '../services';
+import { Job, JobApplication, User } from '../models';
+import { uploadToMega } from '../middleware/uploadfile';
+import { Conflict, ResourceNotFound, Unauthorized } from '../middleware';
+import { Types } from 'mongoose';
+
+// Mock the required models and functions
+jest.mock('../models');
+jest.mock('../middleware/uploadfile');
+
+describe('JobApplicationService', () => {
+  let jobApplicationService: JobApplicationService;
+
+  beforeEach(() => {
+    jobApplicationService = new JobApplicationService();
+    jest.clearAllMocks();
+  });
+
+  describe('applyForJob', () => {
+    const payload = {
+      job_id: new Types.ObjectId(),
+      job_seeker_id: new Types.ObjectId(),
+      cover_letter: 'Cover letter text',
+    };
+
+    it('should apply for a job successfully', async () => {
+		const payload = { job_id: 'job123', job_seeker_id: 'seeker456', cover_letter: 'Cover Letter' };
+		const filePath = '/path/to/resume';
+		const filename = 'resume.pdf';
+		const resumeLink = 'https://mega.nz/file/resume.pdf';
+		const savedApplication = { _id: 'app789', ...payload, resume: resumeLink };
+
+		// Mock the existing application check
+		(JobApplication.findOne as jest.Mock).mockResolvedValue(null);
+
+		// Mock the file upload to return a resume link
+		(uploadToMega as jest.Mock).mockResolvedValue(resumeLink);
+
+		// Mock saving the new application
+		(JobApplication.prototype.save as jest.Mock).mockResolvedValue(savedApplication);
+
+		// Mock updating the user's applied_jobs list
+		(User.findByIdAndUpdate as jest.Mock).mockResolvedValue(true);
+
+		await expect(jobApplicationService.applyForJob(payload, null, null, true)).rejects.toThrow(ResourceNotFound);		
+	});
+
+    it('should throw Conflict if the user already applied for the job', async () => {
+      (JobApplication.findOne as jest.Mock).mockResolvedValue(payload);
+      await expect(jobApplicationService.applyForJob(payload, null, null, true)).rejects.toThrow(Conflict);
+    });
+
+    it('should throw ResourceNotFound if the job does not exist or is closed', async () => {
+      (JobApplication.findOne as jest.Mock).mockResolvedValue(null);
+      (Job.findOne as jest.Mock).mockResolvedValue(null);
+      await expect(jobApplicationService.applyForJob(payload, null, null, true)).rejects.toThrow(ResourceNotFound);
+    });
+  });
+
+  describe('getAllJobsAndApplications', () => {
+    it('should fetch all jobs and applications for an employer', async () => {
+      const user_id = new Types.ObjectId();
+      const mockFind = jest.fn().mockReturnValue({
+        populate: jest.fn().mockResolvedValue([{ applications: [] }]),
+      });
+
+      (Job.find as jest.Mock).mockImplementation(mockFind);
+
+      const result = await jobApplicationService.getAllJobsAndApplications(user_id);
+
+      expect(Job.find).toHaveBeenCalledWith({ employer_id: user_id });
+      expect(result.message).toEqual('Jobs and their Applications Fetch Successfully');
+    });
+  });
+
+  describe('getJobApplicationsByJobId', () => {
+    it('should fetch job applications for a specific job', async () => {
+      const user_id = new Types.ObjectId();
+      const job_id = new Types.ObjectId();
+      const mockFind = jest.fn().mockReturnValue({
+        populate: jest.fn().mockResolvedValue([{ applications: [] }]),
+      });
+
+      (Job.find as jest.Mock).mockImplementation(mockFind);
+
+      const result = await jobApplicationService.getJobApplicationsByJobId(user_id, job_id);
+
+      expect(Job.find).toHaveBeenCalledWith({ employer_id: user_id, _id: job_id });
+      expect(result.message).toEqual('Fetch Applications for single job Successful');
+    });
+  });
+
+  describe('updateJobApplicationStatus', () => {
+    it('should update job application status successfully', async () => {
+      const user_id = new Types.ObjectId();
+      const application_id = new Types.ObjectId();
+      const job = { applications: [application_id] };
+      (Job.findOne as jest.Mock).mockResolvedValue(job);
+      (JobApplication.findByIdAndUpdate as jest.Mock).mockResolvedValue({ status: 'reviewed' });
+
+      const result = await jobApplicationService.updateJobApplicationStatus(user_id, application_id, 'reviewed');
+
+      expect(Job.findOne).toHaveBeenCalledWith({ employer_id: user_id });
+      expect(JobApplication.findByIdAndUpdate).toHaveBeenCalledWith(application_id, { $set: { status: 'reviewed' } }, { new: true });
+      expect(result.message).toEqual('Job status updated successfully');
+    });
+
+    it('should throw Unauthorized if the job does not belong to the employer', async () => {
+      const user_id = new Types.ObjectId();
+      const application_id = new Types.ObjectId();
+      const job = { applications: [] }; // application not in the job applications array
+      (Job.findOne as jest.Mock).mockResolvedValue(job);
+
+      await expect(jobApplicationService.updateJobApplicationStatus(user_id, application_id, 'reviewed')).rejects.toThrow(Unauthorized);
+    });
+  });
+});
+
+
+/* import { JobApplicationService } from '../services/job-application.service';
 import { Conflict } from '../middleware';
 import { JobApplication, User } from '../models';
 import { uploadToMega } from '../middleware/uploadfile';
@@ -164,3 +283,4 @@ describe('JobApplicationService', () => {
         });
     });
 });
+ */

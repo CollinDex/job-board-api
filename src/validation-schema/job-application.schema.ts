@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Types } from "mongoose";
 
 const jobApplicationSchema = z.object({
     job_id: z.string().min(1, { message: "job_id cannot be empty" }),
@@ -6,11 +7,15 @@ const jobApplicationSchema = z.object({
     use_existing_resume: z.coerce.boolean({ message: "Must be a boolean" }).optional()
 });
 
+const objectIdSchema = z.string().refine((value) => Types.ObjectId.isValid(value), {
+    message: "Invalid ObjectId",
+});
+
 // Define Zod schema for status validation
 const jobApplicationStatusSchema = z.object({
-    job_id: z.string().min(1, { message: "Job ID cannot be empty" }),
-    job_seeker_id: z.string().min(1, { message: "Job Seeker ID cannot be empty" }),
-    status: z.enum(['applied', 'interviewing', 'hired', 'rejected', 'open'], { 
+    application_id: objectIdSchema,
+    status: z.enum(['applied', 'reviewed', 'interview', 'hired', 'rejected'], { 
     })
 });
-export { jobApplicationSchema,jobApplicationStatusSchema  };
+
+export { jobApplicationSchema,jobApplicationStatusSchema, objectIdSchema  };
