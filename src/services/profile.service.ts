@@ -65,7 +65,7 @@ export class ProfileService {
             const userProfile = await Profile.findOne({ user_id: user_id });
 
             if(!userProfile) {
-                throw new Conflict("User Profile Not Found");
+                throw new ResourceNotFound("User Profile Not Found");
             }
     
             const resume = await uploadToMega(filePath, filename);

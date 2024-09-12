@@ -3,6 +3,7 @@ import { ProfileService } from "../services";
 import { sendJsonResponse } from "../utils/send-response";
 import mongoose from "mongoose";
 import { deleteFile } from "../middleware/uploadfile";
+import { BadRequest } from "../middleware";
 
 const profileService = new ProfileService();
 
@@ -39,7 +40,11 @@ const uploadResume = async (req: Request, res: Response, next: NextFunction) => 
     try {
       
       const user_id = new mongoose.Types.ObjectId(req.user.user_id);
-  
+      
+      if (!req.file) {
+        throw new BadRequest("No file is uploaded");
+      }
+      
       const { message, profile } = await profileService.uploadResume(
         user_id,
         req.file?.path,
