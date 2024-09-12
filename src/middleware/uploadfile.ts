@@ -55,11 +55,18 @@ const upload = multer({
 
 // Middleware to handle file uploads
 export function uploadFile(req: Request, res: Response, next: NextFunction) {
+
+  if (req.body.use_existing_resume) { // MAKE FILE UPLOAD OPTIONAL
+    return next();
+  }
+
   const uploadSingle = upload.single("resume");
 
   uploadSingle(req, res, function (err) {
     if (err instanceof multer.MulterError) {
       return next(new BadRequest(`File upload failed: ${err.message}`));
+    } else if (err?.message === "Unexpected end of form") {
+      return next(new BadRequest(`No file Uploaded`));
     } else if (err) {
       return next(new BadRequest(`An unknown error occurred during the upload: ${err.message}`));
     }

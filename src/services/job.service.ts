@@ -1,7 +1,7 @@
-import { User, Job } from "../models";
-import { IJob } from "../types";
-import { Conflict, HttpError, ResourceNotFound } from "../middleware";
-import { Types } from "mongoose";
+import { User, Job } from '../models';
+import { IJob } from '../types';
+import { Conflict, HttpError, ResourceNotFound } from '../middleware';
+import { Types } from 'mongoose';
 
 export class JobService {
     public async createJob (payload:Partial<IJob>): Promise<{message: string, job: IJob}> {
