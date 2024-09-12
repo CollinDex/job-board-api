@@ -2,7 +2,8 @@ import { z } from "zod";
 
 const jobApplicationSchema = z.object({
     job_id: z.string().min(1, { message: "job_id cannot be empty" }),
-    cover_letter: z.string().min(1, { message: "Cover Letter cannot be empty" })
+    cover_letter: z.string().min(1, { message: "Cover Letter cannot be empty" }),
+    use_existing_resume: z.coerce.boolean({ message: "Must be a boolean" }).optional()
 });
 
 // Define Zod schema for status validation
