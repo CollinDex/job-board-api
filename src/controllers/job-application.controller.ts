@@ -1,90 +1,107 @@
 import { NextFunction, Request, Response } from 'express';
 import { JobApplicationService } from '../services';
 import { sendJsonResponse } from '../utils/send-response';
-import { jobApplicationSchema, jobApplicationStatusSchema } from '../validation-schema/job-application.schema';
+import { jobApplicationSchema } from '../validation-schema/job-application.schema';
 import { ZodError } from 'zod';
 import mongoose from 'mongoose';
 import { deleteFile } from '../middleware/uploadfile';
+import { BadRequest, Unauthorized } from '../middleware';
+import { UserRole } from '../types';
 
 const jobApplicationService = new JobApplicationService();
 
 const applyForJob = async (req: Request, res: Response, next: NextFunction) => {
-	try {
-		const validatedData = jobApplicationSchema.parse(req.body);
+  try {
+    const validatedData = jobApplicationSchema.parse(req.body);
+    const { job_id, cover_letter, use_existing_resume } = validatedData;
+    const { user_id } = req.user;
+	
+    const jobObjectId = new mongoose.Types.ObjectId(job_id);
+    const userObjectId = new mongoose.Types.ObjectId(user_id);
 
-		const { job_id, cover_letter } = validatedData;
-		const { user_id } = req.user;
+    const filePath = use_existing_resume ? null : req.file?.path;
+    const filename = use_existing_resume ? null : req.file?.filename;
 
-		const jobObjectId = new mongoose.Types.ObjectId(job_id);
-		const userObjectId = new mongoose.Types.ObjectId(user_id);
+    const { message, jobApplication } = await jobApplicationService.applyForJob({
+      job_id: jobObjectId,
+      job_seeker_id: userObjectId,
+      cover_letter
+    }, filePath, filename, use_existing_resume);
 
-		const { message, jobApplication } = await jobApplicationService.applyForJob(
-			{
-				job_id: jobObjectId,
-				job_seeker_id: userObjectId,
-				cover_letter
-			},
-			req.file?.path,
-			req.file?.filename
-		);
+    sendJsonResponse(res, 201, message, { jobApplication });
+  } catch (error) {
+    if (req.file) {
+      await deleteFile(req.file?.path);
+    };
 
-		sendJsonResponse(res, 201, message, { jobApplication });
-	} catch (error) {
-		if (req.file) {
-			await deleteFile(req.file?.path);
-		}
+    if (error instanceof ZodError) {
+      const errorMessages = error.errors.map((issue) => ({
+        path: issue.path.join("."),
+        message: issue.message
+      }));
 
-		if (error instanceof ZodError) {
-			const errorMessages = error.errors.map((issue) => ({
-				path: issue.path.join('.'),
-				message: issue.message
-			}));
-
-			return res.status(422).json({
-				success: false,
-				errors: errorMessages
-			});
-		}
-		next(error);
-	}
-};
-
-const getAllJobApplicationsById = async (req: Request, res: Response) => {
-	try {
-		const { job_id } = req.params;
-
-		const jobApplicationsById = await jobApplicationService.getJobApplicationsByJobId(job_id);
-
-		return res.status(200).json(jobApplicationsById);
-	} catch (error) {
-		return res.status(500).json({ message: error.message });
-
+      return res.status(422).json({
+        success: false,
+        errors: errorMessages
+      });
+    }
+    next(error);
   }
 };
 
-const updateJobApplicationStatus = async (req: Request, res: Response) => {
-    try {
-        // Validate the request body using the schema
-        const validateStatusData = jobApplicationStatusSchema.parse(req.body);
-        const { job_id, status } = validateStatusData;
+const getAllJobsAndApplications = async (req: Request, res: Response, next: NextFunction) => {
+  try {
 
-        // Update the job application status
-        const jobApplicationStatus = await jobApplicationService.updateJobApplicationStatus(job_id, status);
+      if (req.user.role != UserRole.EMPLOYER) {
+          throw new Unauthorized("Only Employers can fetch job applications");
+      };
 
+      const user_id = new mongoose.Types.ObjectId(req.user.user_id);
+      const { message, applications } = await jobApplicationService.getAllJobsAndApplications(user_id);
+      sendJsonResponse(res, 200, message, {applications});
+  } catch (error) {
+      next(error);
+  }
+};
 
-        return res.status(200).json(jobApplicationStatus);
-    } catch (error) {
-        if (error instanceof ZodError) {
-            // Handle validation errors specifically
-            return res.status(400).json({ message: "Validation error", errors: error.errors });
-        }
+const getJobApplicationsById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
 
-        // Handle general server errors
-        return res.status(500).json({ message: error.message });
-    }
+      if (req.user.role != UserRole.EMPLOYER) {
+          throw new Unauthorized("Only Employers can fetch job applications");
+      };
+
+      if (!req.params.job_id) {
+        throw new BadRequest("job_id is required");
+    };
+
+      const user_id = new mongoose.Types.ObjectId(req.user.user_id);
+      const job_id = new mongoose.Types.ObjectId(req.params.job_id);
+
+      const { message, applications } = await jobApplicationService.getJobApplicationsByJobId(user_id, job_id);
+      sendJsonResponse(res, 200, message, {applications});
+  } catch (error) {
+      next(error);
+  }
+};
+
+const updateJobApplicationStatus = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+      if (req.user.role != UserRole.EMPLOYER) {
+          throw new Unauthorized("Only Employers can set a job application status");
+      };
+
+      const {status } = req.body;
+      const user_id = new mongoose.Types.ObjectId(req.user.user_id);
+      const application_id = new mongoose.Types.ObjectId(req.body.application_id);
+
+      const { message, job } = await jobApplicationService.updateJobApplicationStatus(user_id, application_id, status);
+      sendJsonResponse(res, 200, message, {job});
+  } catch (error) {
+      next(error);
+  }
 };
 
 
-
-
-export { applyForJob, getAllJobApplicationsById, updateJobApplicationStatus};
+export { applyForJob, getAllJobsAndApplications, getJobApplicationsById, updateJobApplicationStatus};
