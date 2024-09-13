@@ -1,10 +1,12 @@
-export const jobApplication = `
+export const applyForJobDoc = `
 /**
  * @swagger
  * /api/v1/jobs/apply:
  *   post:
  *     summary: Apply for a job
  *     tags: [Job Application]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -22,6 +24,10 @@ export const jobApplication = `
  *                 type: string
  *                 format: binary
  *                 description: "PDF, DOC, or DOCX format of your resume"
+ *               use_existing_resume:
+ *                 type: boolean
+ *                 example: true
+ *                 description: "Set to true if you want to use an existing resume from your profile."
  *     responses:
  *       201:
  *         description: The job application was successfully submitted
@@ -79,68 +85,106 @@ export const jobApplication = `
  */
 `;
 
-export const getAllJobApplicationsById = `
+export const getAllJobsAndApplicationsDoc = `
 /**
  * @swagger
- * /api/v1/jobs/getAllJobs/{job_id}:
+ * /api/v1/jobs:
  *   get:
- *     summary: Get all job applications by job ID
+ *     summary: Fetch all jobs and their applications
  *     tags: [Job Application]
- *     parameters:
- *       - in: path
- *         name: job_id
- *         schema:
- *           type: string
- *         required: true
- *         description: The ID of the job to retrieve applications for
- *         example: 64bcf7b4c7e03d002bfa8994
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Job applications retrieved successfully
+ *         description: Successfully fetched all jobs and their applications
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 status:
- *                   type: number
- *                   example: 200
  *                 message:
  *                   type: string
- *                   example: Job applications retrieved successfully
- *                 data:
+ *                   example: Jobs and their Applications Fetch Successfully
+ *                 applications:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
- *                       job_id:
+ *                       id:
  *                         type: string
- *                       job_seeker_id:
+ *                       title:
  *                         type: string
- *                       cover_letter:
+ *                       employer_id:
  *                         type: string
- *                       resume:
- *                         type: string
- *                       status:
- *                         type: string
- *                         example: applied
- *                       created_at:
- *                         type: string
- *                       updated_at:
- *                         type: string
- *       404:
- *         description: No applications found for the given job ID
+ *                       applications:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *       401:
+ *         description: Unauthorized - Only Employers can fetch job applications
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
  */
 `;
-export const updateJobApplicationStatus = `
+
+export const getJobApplicationsByIdDoc = `
 /**
  * @swagger
- * /api/v1/jobs/updateJobApplicationStatus:
+ * /api/v1/jobs/{job_id}:
+ *   get:
+ *     summary: Fetch job applications for a specific job
+ *     tags: [Job Application]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: job_id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the job to fetch applications for
+ *     responses:
+ *       200:
+ *         description: Successfully fetched job applications
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Fetch Applications for single job Successful
+ *                 applications:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       title:
+ *                         type: string
+ *                       employer_id:
+ *                         type: string
+ *       400:
+ *         description: job_id is required
+ *       401:
+ *         description: Unauthorized - Only Employers can fetch job applications
+ *       404:
+ *         description: Job not Found
+ *       500:
+ *         description: Internal Server Error
+ */
+`;
+
+export const updateJobApplicationStatusDoc = `
+/**
+ * @swagger
+ * /api/v1/jobs/update-status:
  *   put:
  *     summary: Update the status of a job application
  *     tags: [Job Application]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -148,49 +192,41 @@ export const updateJobApplicationStatus = `
  *           schema:
  *             type: object
  *             properties:
- *               job_id:
+ *               application_id:
  *                 type: string
- *                 description: The ID of the job application
- *                 example: 64bcf7b4c7e03d002bfa8994
+ *                 example: "64db88e70e4737e7e20c7db1"
  *               status:
  *                 type: string
- *                 description: The new status of the job application
- *                 enum: [applied, interviewing, hired, rejected, open]
- *                 example: hired
+ *                 enum: ['applied', 'reviewed', 'interview', 'hired', 'rejected']
+ *                 example: "reviewed"
  *     responses:
  *       200:
- *         description: Job application status updated successfully
+ *         description: Successfully updated the job application status
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 status:
- *                   type: number
- *                   example: 200
  *                 message:
  *                   type: string
- *                   example: Job application status updated successfully
- *       400:
- *         description: Validation error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: number
- *                   example: 400
- *                 message:
- *                   type: string
- *                   example: Validation error
- *                 errors:
- *                   type: array
- *                   items:
- *                     type: object
+ *                   example: Job status updated successfully
+ *                 job:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     job_id:
+ *                       type: string
+ *                     job_seeker_id:
+ *                       type: string
+ *                     status:
+ *                       type: string
+ *                       example: "reviewed"
+ *       401:
+ *         description: Unauthorized - Only Employers can set a job application status
  *       404:
- *         description: Job application not found
+ *         description: JobApplication not Found
  *       500:
- *         description: Some server error
+ *         description: Internal Server Error
  */
 `;
