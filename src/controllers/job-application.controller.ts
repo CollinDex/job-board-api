@@ -5,8 +5,7 @@ import { jobApplicationSchema } from '../validation-schema/job-application.schem
 import { ZodError } from 'zod';
 import mongoose from 'mongoose';
 import { deleteFile } from '../middleware/uploadfile';
-import { BadRequest, Unauthorized } from '../middleware';
-import { UserRole } from '../types';
+import { BadRequest } from '../middleware';
 
 const jobApplicationService = new JobApplicationService();
 
@@ -52,10 +51,6 @@ const applyForJob = async (req: Request, res: Response, next: NextFunction) => {
 const getAllJobsAndApplications = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
-      if (req.user.role != UserRole.EMPLOYER) {
-          throw new Unauthorized("Only Employers can fetch job applications");
-      };
-
       const user_id = new mongoose.Types.ObjectId(req.user.user_id);
       const { message, applications } = await jobApplicationService.getAllJobsAndApplications(user_id);
       sendJsonResponse(res, 200, message, {applications});
@@ -66,10 +61,6 @@ const getAllJobsAndApplications = async (req: Request, res: Response, next: Next
 
 const getJobApplicationsById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-
-      if (req.user.role != UserRole.EMPLOYER) {
-          throw new Unauthorized("Only Employers can fetch job applications");
-      };
 
       if (!req.params.job_id) {
         throw new BadRequest("job_id is required");
@@ -87,11 +78,6 @@ const getJobApplicationsById = async (req: Request, res: Response, next: NextFun
 
 const updateJobApplicationStatus = async (req: Request, res: Response, next: NextFunction) => {
   try {
-
-      if (req.user.role != UserRole.EMPLOYER) {
-          throw new Unauthorized("Only Employers can set a job application status");
-      };
-
       const {status } = req.body;
       const user_id = new mongoose.Types.ObjectId(req.user.user_id);
       const application_id = new mongoose.Types.ObjectId(req.body.application_id);
@@ -107,8 +93,6 @@ const getAppliedJobs = async (req: Request, res: Response, next: NextFunction) =
   try {
 
       const user_id = new mongoose.Types.ObjectId(req.user.user_id);
-      console.log(user_id);
-
       const { message, applications } = await jobApplicationService.getAppliedJobs(user_id);
       sendJsonResponse(res, 200, message, {applications});
   } catch (error) {

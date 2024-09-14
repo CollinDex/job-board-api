@@ -13,6 +13,14 @@ export const authMiddleware = async (
 ) => {
   try {
     const authHeader = req.headers.authorization;
+    //const apiKey = req.headers['x-api-key'];
+
+    /* if (!apiKey || (apiKey !== config.API_KEY)) {
+      return res.status(403).json({
+        status_code: "403",
+        message: "Invalid Api Key",
+      });
+    } */
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({

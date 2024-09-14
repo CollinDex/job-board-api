@@ -3,6 +3,7 @@ dotenv.config();
 
 const config = {
   port: process.env.PORT ?? 8000,
+  API_KEY: process.env.API_KEY,
   NODE_ENV: process.env.NODE_ENV,
   MONGO_URI: process.env.MONGO_URI,
   MONGO_HOST: process.env.MONGO_HOST,
