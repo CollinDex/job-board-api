@@ -1,9 +1,9 @@
 export const applyForJobDoc = `
 /**
  * @swagger
- * /api/v1/jobs/apply:
+ * /api/v1/jobs:
  *   post:
- *     summary: Apply for a job
+ *     summary: Job Seeker- Apply for a job
  *     tags: [Job Application]
  *     security:
  *       - bearerAuth: []
@@ -17,6 +17,7 @@ export const applyForJobDoc = `
  *               job_id:
  *                 type: string
  *                 example: "64db88e70e4737e7e20c7db1"
+ *                 description: "Id of the job you want to apply for"
  *               cover_letter:
  *                 type: string
  *                 example: "I am excited to apply for this position because..."
@@ -27,7 +28,7 @@ export const applyForJobDoc = `
  *               use_existing_resume:
  *                 type: boolean
  *                 example: true
- *                 description: "Set to true if you want to use an existing resume from your profile."
+ *                 description: "Set to true if you want to use an existing resume from your profile. Else the resume on your profile will be used for your application"
  *     responses:
  *       201:
  *         description: The job application was successfully submitted
@@ -90,7 +91,7 @@ export const getAllJobsAndApplicationsDoc = `
  * @swagger
  * /api/v1/jobs:
  *   get:
- *     summary: Fetch all jobs and their applications
+ *     summary: Employer - Fetch all jobs and their applications
  *     tags: [Job Application]
  *     security:
  *       - bearerAuth: []
@@ -132,7 +133,7 @@ export const getJobApplicationsByIdDoc = `
  * @swagger
  * /api/v1/jobs/{job_id}:
  *   get:
- *     summary: Fetch job applications for a specific job
+ *     summary: Employer - Fetch job applications for a specific job
  *     tags: [Job Application]
  *     security:
  *       - bearerAuth: []
@@ -179,9 +180,9 @@ export const getJobApplicationsByIdDoc = `
 export const updateJobApplicationStatusDoc = `
 /**
  * @swagger
- * /api/v1/jobs/update-status:
+ * /api/v1/jobs/status:
  *   put:
- *     summary: Update the status of a job application
+ *     summary: Employer - Update the status of a job seeker's application
  *     tags: [Job Application]
  *     security:
  *       - bearerAuth: []
@@ -197,8 +198,7 @@ export const updateJobApplicationStatusDoc = `
  *                 example: "64db88e70e4737e7e20c7db1"
  *               status:
  *                 type: string
- *                 enum: ['applied', 'reviewed', 'interview', 'hired', 'rejected']
- *                 example: "reviewed"
+ *                 example: "hired || reviewed || interview | rejected"
  *     responses:
  *       200:
  *         description: Successfully updated the job application status
@@ -221,11 +221,47 @@ export const updateJobApplicationStatusDoc = `
  *                       type: string
  *                     status:
  *                       type: string
- *                       example: "reviewed"
+ *                       example: "hired"
  *       401:
  *         description: Unauthorized - Only Employers can set a job application status
  *       404:
  *         description: JobApplication not Found
+ *       500:
+ *         description: Internal Server Error
+ */
+`;
+
+export const getAppliedJobs = `
+/**
+ * @swagger
+ * /api/v1/jobs/applied:
+ *   get:
+ *     summary: Job Seeeker - Fetch all jobs applications
+ *     tags: [Job Application]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully fetched all job applications
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Fetch Successful
+ *                 applications:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       title:
+ *                         type: string
+ *                       employer_id:
+ *                         type: string
  *       500:
  *         description: Internal Server Error
  */
