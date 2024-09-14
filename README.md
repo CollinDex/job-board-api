@@ -19,7 +19,7 @@ The **Job Listing Platform** is a web-based application designed to connect job 
 
 
 ### General Features:
-- **User Authentication:** Secure user registration and login system (OAuth supported).
+- **User Authentication:** Secure user registration and login system.
 - **Profile Management:** Create and update user profiles with personal data.
  
 ## Tech Stack

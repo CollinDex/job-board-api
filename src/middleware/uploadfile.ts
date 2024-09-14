@@ -56,7 +56,8 @@ const upload = multer({
 // Middleware to handle file uploads
 export function uploadFile(req: Request, res: Response, next: NextFunction) {
 
-  if (req.body.use_existing_resume) { // MAKE FILE UPLOAD OPTIONAL
+  if (req.body.use_existing_resume) { 
+    // MAKE FILE UPLOAD OPTIONAL
     return next();
   }
 
@@ -127,4 +128,4 @@ export function deleteFile(path: string): Promise<void> {
       else resolve();
     });
   });
-}
+};
