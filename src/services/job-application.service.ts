@@ -133,4 +133,25 @@ export class JobApplicationService {
             throw new HttpError(error.status || 500, error.message || error);
         }
     };
+
+    public async getAppliedJobs (user_id: Types.ObjectId): Promise<{message: string, applications: IJobApplication[]}> {
+        try {
+            console.log(user_id);
+            const jobs = await JobApplication.find({job_seeker_id: user_id});
+
+            if (!jobs) {
+                throw new ResourceNotFound("Job not Found");
+            };
+
+            return {
+                message: "Fetch Appliactions Succesfully",
+                applications: jobs
+            }
+        } catch (error) {
+            if (error instanceof HttpError) {
+            throw error;
+            }
+            throw new HttpError(error.status || 500, error.message || error);
+        }
+    }
 }

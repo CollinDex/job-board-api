@@ -103,5 +103,18 @@ const updateJobApplicationStatus = async (req: Request, res: Response, next: Nex
   }
 };
 
+const getAppliedJobs = async (req: Request, res: Response, next: NextFunction) => {
+  try {
 
-export { applyForJob, getAllJobsAndApplications, getJobApplicationsById, updateJobApplicationStatus};
+      const user_id = new mongoose.Types.ObjectId(req.user.user_id);
+      console.log(user_id);
+
+      const { message, applications } = await jobApplicationService.getAppliedJobs(user_id);
+      sendJsonResponse(res, 200, message, {applications});
+  } catch (error) {
+      next(error);
+  }
+};
+
+
+export { applyForJob, getAllJobsAndApplications, getJobApplicationsById, updateJobApplicationStatus, getAppliedJobs};
