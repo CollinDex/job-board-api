@@ -1,6 +1,6 @@
 import { Conflict, HttpError, ResourceNotFound, Unauthorized } from '../middleware';
 import { Job, JobApplication, Profile, User } from '../models';
-import { IJob, IJobApplication, JobStatus } from '../types';
+import { IJob, IJobApplication, JobApplicationStatus, JobStatus } from '../types';
 import { uploadToMega } from '../middleware/uploadfile';
 import { Types } from 'mongoose';
 
@@ -42,7 +42,7 @@ export class JobApplicationService {
   
           await User.findByIdAndUpdate(
               job_seeker_id, 
-              { $push: { applied_jobs: savedApplication._id } },
+              { $push: { applied_jobs: jobExists._id } },
               { new: true }
           );
 
@@ -133,4 +133,27 @@ export class JobApplicationService {
             throw new HttpError(error.status || 500, error.message || error);
         }
     };
+
+    public async getAppliedJobs (user_id: Types.ObjectId): Promise<{message: string, applications: { job: Types.ObjectId; application_status: JobApplicationStatus;
+    }[]}> {
+        try {
+            const applications = await JobApplication.find({ job_seeker_id: user_id }).populate({path: 'job_id', select: '-applications',});
+            const jobsWithApplicationStatus = applications.map(application => {    
+                return {
+                    job: application.job_id,
+                    application_status: application.status, 
+                };
+            });
+
+            return {
+                message: "Fetch Applications Succesfully",
+                applications: jobsWithApplicationStatus
+            }
+        } catch (error) {
+            if (error instanceof HttpError) {
+            throw error;
+            }
+            throw new HttpError(error.status || 500, error.message || error);
+        }
+    }
 }

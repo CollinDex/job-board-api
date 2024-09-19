@@ -3,9 +3,8 @@ import express, { Express, Request, Response } from "express";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swaggerConfig";
 import { errorHandler, routeNotFound } from "./middleware";
-import { authRoute, jobApplicationRoute, userProfileRoute  } from "./routes";
-import { jobRoute } from "./routes/job.route";
-import { jobSearchRoute } from "./routes/search.route";
+import { authRoute, jobApplicationRoute, userProfileRoute, jobRoute, jobSearchRoute  } from "./routes";
+
 
 const app: Express = express();
 app.options("*", cors());
