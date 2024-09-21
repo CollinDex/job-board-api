@@ -111,9 +111,9 @@ export async function uploadToMega (filePath: string, originalFileName: string) 
     
     console.log('A file was uploaded to Mega!');
     await deleteFile(filePath);
-
-    // Return the URL or link to the uploaded file
-    return await uploadedFile.link(true);
+    
+    const fileLink = await uploadedFile.link();
+    return fileLink;
   } catch (error) {
     console.error('Error uploading file to Mega:', error);
     throw new Error("Failed to upload file");
