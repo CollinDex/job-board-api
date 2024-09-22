@@ -56,6 +56,7 @@ export interface IProfile extends Base {
 export interface IJob extends Base {
     title: string;
     description: string;
+    company: string;
     qualifications: string[]; 
     responsibilities: string[];
     location: string;
