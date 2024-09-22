@@ -4,6 +4,7 @@ import { IJob, JobStatus } from "../types";
 const jobSchema = new Schema<IJob>({
     title: { type: SchemaTypes.String, required: true },
     description: { type: SchemaTypes.String, required: true },
+    company: { type: SchemaTypes.String, required: true },
     qualifications: [{ type: SchemaTypes.String, required: true }], 
     responsibilities: [{ type: SchemaTypes.String, required: true }],
     location: { type: SchemaTypes.String, required: true },

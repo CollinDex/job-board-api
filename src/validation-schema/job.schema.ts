@@ -5,6 +5,7 @@ import { JobStatus } from '../types';
 const createJobSchema = z.object({
   title: z.string().min(1, { message: "Title cannot be empty" }),
   description: z.string().min(1, { message: "Description cannot be empty" }),
+  company: z.string().min(1, { message: "Company cannot be empty" }),
   qualifications: z.array(z.string().min(1, { message: "Qualification cannot be empty" })),
   responsibilities: z.array(z.string().min(1, { message: "Responsibility cannot be empty" })),
   location: z.string().min(1, { message: "Location cannot be empty" }),
@@ -31,6 +32,7 @@ const updateJobSchema = z.object({
   job_id: objectIdSchema,
   title: z.string().min(1, { message: "Title cannot be empty" }).optional(),
   description: z.string().min(1, { message: "Description cannot be empty" }).optional(),
+  company: z.string().min(1, { message: "Company cannot be empty" }).optional(),
   qualifications: z.array(z.string().min(1, { message: "Qualification cannot be empty" })).optional(),
   responsibilities: z.array(z.string().min(1, { message: "Responsibility cannot be empty" })).optional(),
   location: z.string().min(1, { message: "Location cannot be empty" }).optional(),
