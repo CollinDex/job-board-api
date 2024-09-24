@@ -10,7 +10,7 @@ export class JobApplicationService {
       jobApplication: Partial<IJobApplication>;
   }> {
       try {
-          const { job_id, job_seeker_id, cover_letter } = payload;
+          const { job_id, job_seeker_id, cover_letter, applicant_name } = payload;
           const existingApplication = await JobApplication.findOne({ job_id, job_seeker_id });
 
           const jobExists = await Job.findOne({_id: job_id, status: JobStatus.OPEN});
@@ -37,7 +37,7 @@ export class JobApplicationService {
               throw new Conflict("No resume provided for the job application.");
           }
   
-          const newApplication = new JobApplication({ job_id, job_seeker_id, cover_letter, resume });
+          const newApplication = new JobApplication({ job_id, job_seeker_id, applicant_name, cover_letter, resume });
           const savedApplication = await newApplication.save();
   
           await User.findByIdAndUpdate(
