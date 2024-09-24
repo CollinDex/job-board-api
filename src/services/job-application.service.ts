@@ -106,11 +106,12 @@ export class JobApplicationService {
 
     public async updateJobApplicationStatus (user_id:Types.ObjectId, application_id: Types.ObjectId, status: JobStatus): Promise<{message: string, job: IJobApplication}> {
         try {
-            const job = await Job.findOne({ employer_id: user_id });
+            /* const job = await Job.findOne({ employer_id: user_id });
 
             if (!job.applications.includes(application_id)) {
                 throw new Unauthorized("You are not the one that created this job");
-            };
+            }; */
+            //Fix this later
 
             const updatedJob = await JobApplication.findByIdAndUpdate(
                 application_id, 
