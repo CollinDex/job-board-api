@@ -13,7 +13,7 @@ const applyForJob = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validatedData = jobApplicationSchema.parse(req.body);
     const { job_id, cover_letter, use_existing_resume } = validatedData;
-    const { user_id } = req.user;
+    const { user_id, username } = req.user;
 	
     const jobObjectId = new mongoose.Types.ObjectId(job_id);
     const userObjectId = new mongoose.Types.ObjectId(user_id);
@@ -24,6 +24,7 @@ const applyForJob = async (req: Request, res: Response, next: NextFunction) => {
     const { message, jobApplication } = await jobApplicationService.applyForJob({
       job_id: jobObjectId,
       job_seeker_id: userObjectId,
+      applicant_name: username,
       cover_letter
     }, filePath, filename, use_existing_resume);
 

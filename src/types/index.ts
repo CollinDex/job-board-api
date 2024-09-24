@@ -70,6 +70,7 @@ export interface IJob extends Base {
   
 export interface IJobApplication extends Base {
     job_id: Types.ObjectId;
+    applicant_name: string;
     job_seeker_id: Types.ObjectId;
     status: JobApplicationStatus;
     cover_letter: string;
